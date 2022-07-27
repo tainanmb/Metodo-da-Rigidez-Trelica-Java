@@ -1,0 +1,123 @@
+package algebraLinear;
+/** 
+ * Classe para resolução de sistemas lineares via eliminação de Gauss 
+ * com sistema matricial da forma Ax = b.
+ * <p>
+ * Dados:
+ * <ul>
+ * <li> A - matriz de coeficientes do sistema
+ * <li> b - vetor de coeficientes dos termos independentes
+ * <li> X - vetor com a solução do sistema
+ * </ul>
+ * @author Ana Paula Moura, Eduarda Marques, Tainan Brandão
+ * @version 1.0
+ */
+
+public abstract class LinearEquationSystem {  
+
+	/**
+	 * Método de solução de sistemas de equações lineares 
+	 * a partir do método de Gauss
+	 * @param A matriz a com os coeficientes do sistema
+	 * @param b vetor b dos termos independentes
+	 * @return X vetor com a solução do sistema
+	 */
+    public static Vetor SolverEquation(Matriz A, Vetor b) {    	
+    	
+        //ETAPA DE ESCALONAMENTO
+    	//escalonar para k igual 1 (promera linha) até n-1 numero de linhas menos um (penultima linha)
+    	//a ultima linha não entra porque é a que resolve o sistema, não tem pivô
+        for (int k = 0; k < A.getN_Linhas() - 1; k++) {              
+        	
+        	//procura o maior k-enésimo coeficiente em módulo   
+        	//retorna o valor absoluto do coef do pivô da linha que está sendo analisada
+            double pivo = Math.abs(A.getMatriz(k, k));          
+            
+            //preenche a variavel pivoIndex com a linha k analisada
+            int pivoIndex = k;
+                        
+            //para i variando de k+1 (linha abaixo do pivô) até i<número de linhas (ultima linha)
+            for (int i = k + 1; i < A.getN_Linhas(); i++) {
+               
+            	//verifica se os coeficiente do pivo são inferiores
+            	//aos coeficientes abaixo na posição ik (i: linha abaixo do pivo, k: linha do pivo)
+            	//caso positivo pivo se torna o coeficiente encontrado e pivoIndex a linha do pivô
+            	if (pivo < Math.abs(A.getMatriz(i, k))) {
+            		pivo = Math.abs(A.getMatriz(i, k));
+                    pivoIndex = i;
+                }
+            }
+            if (pivoIndex != k) {
+                //se o pivô foi alterado, inverte as linhas para que ele fique na linha mais alta
+            	//troca a ordem pra ficar o maior pivô na primeira linha 
+            	
+            	//para j variando - vai andando as colunas
+                for (int j = 0; j < A.getN_Colunas(); j++) {                	
+                    //temp é a linha que está na primeira posição
+                	double temp = A.getMatriz(k, j);
+                	//seta na linha mais alta os valores associados ao maior coeficiente
+                    A.setMatriz(k, j, A.getMatriz(pivoIndex, j));
+                    //seta na linha de onde saiu o maior coeficiente os vaores da linha mais alta                    
+                    A.setMatriz(pivoIndex, j, temp); 
+                }
+                
+                //faz o mesmo para vetor
+                double temp = b.getVetor(k);
+                b.setVetor(k, b.getVetor(pivoIndex));
+                b.setVetor(pivoIndex, temp);            
+            }
+            
+            //verifica se o pivô é nulo
+            if (A.getMatriz(k, k) == 0) {
+            	 return null;
+                
+            } else {
+                //se o pivo não é nulo realiza o escalonamento
+            	
+            	//para k+1 (linha abaixo do pivô) até N_Linhas (última linha)
+                for (int m = k + 1; m < A.getN_Linhas(); m++) {
+                	//define o fator de multiplicação que vai zerar 
+                	//todos os coeficientes da coluna k do pivô
+                    double F = -A.getMatriz(m, k) / A.getMatriz(k, k);
+
+                    //considera que deu certo a linha abaixo do pivô seta na linha m coluna k o zero
+                    A.setMatriz(m, k, 0);
+                   
+                    //principio de multiplicar a linha k do pivô pelo fator F
+                    //depois soma a linha abaixo do pivô que está sendo analisada (m)
+                    //com essa multiplicação a posição abaixo do pivô zera
+                    //as demais posições/colunas tem que ser calculadas                    
+                    b.setVetor(m, b.getVetor(m)+ F* b.getVetor(k));
+                    for (int l = k + 1; l < A.getN_Colunas(); l++) {
+                    	A.setMatriz(m, l, A.getMatriz(m, l)+F*A.getMatriz(k, l));                      
+                    }
+                }
+            }
+        }
+        
+        //ETAPA DE RESOLVER O SISTEMA        
+        Vetor X = new Vetor (A.getN_Linhas());
+
+        //percorrer resolvendo as equações de baixo pra cima,
+        //pois resolve primeiro a equação da última linha
+        for (int i = A.getN_Linhas() - 1; i >= 0; i--) {
+        	
+        	//setar no vetor solução (X) o valor do vetor escalonado (b)
+        	//na posição que está resolvendo a equação
+        	X.setVetor(i, b.getVetor(i));
+           
+        	//fórmula para solucionar o sistema linha a linha
+        	//x = (bi - XjAij)/pivô
+        	
+        	//(bi - XjAij)
+            for (int j = i + 1; j < A.getN_Linhas(); j++) {
+            	X.setVetor(i, X.getVetor(i)- X.getVetor(j)*A.getMatriz(i, j));
+               
+            }
+            //setar no vetor solução: x = (bi - XjAij)/pivô
+            X.setVetor(i, X.getVetor(i)/A.getMatriz(i, i));          
+        }        
+        
+       return X;
+    }
+}

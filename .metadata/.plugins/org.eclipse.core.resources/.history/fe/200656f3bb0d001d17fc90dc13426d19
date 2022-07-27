@@ -1,0 +1,97 @@
+package modelo;
+import processor.*;
+import util.*;
+import post_processor.PostProcessor;
+import pre_processor.*;
+import algebraLinear.*;
+
+/** 
+ * Classe para preenchimento dos dados de um modelo estrutural reticulado espacial
+ * com entrada de dados por escolha do usuário via arquivo.
+ * <p>
+ * Dados:
+ * <ul>
+ * <li> modelo - variável do tipo Modelo
+ * </ul>
+ * @author Ana Paula Moura, Eduarda Marques, Tainan Brandão
+ * @version 1.0
+ */
+
+public class Principal {
+	public static void main (String[] args) {
+		
+		Modelo modelo = null;
+		
+		System.out.println ("**Programa de computação**");
+		
+		String fileName = FileUtilities.getFileName(); // Método que pega o arquivo de leitura desejado
+		
+		//pre_processor: preencher o modelo via arquivo
+		modelo = PreProcessadorByFile.preencher_modelo(fileName);
+		
+		//processor: resolver o modelo (assembler=montagem + processor=solução)
+		Processor.solverModel(modelo);	
+		
+		//post_processor: apresentar os resultados do problema
+		PostProcessor.printResults("saida.txt", modelo);
+		
+		System.out.println ("**Fim da análise**");
+		
+//		System.out.println(modelo.getBarra("B12").getEquivalentLoadGlobal());
+//		System.out.println(modelo.getBarra("B23").getEquivalentLoadGlobal());
+
+
+		Assembler modelo_aux = new Assembler (modelo);
+		Matriz k_B12 = Barra.k_global(modelo.getBarra("B12"));
+		System.out.println (k_B12);
+		Matriz k = modelo_aux.get_k_total();
+    	System.out.println (k);
+//		Matriz k2 = Barra.k_global(modelo.getBarra("B23"));
+//		System.out.println (k2);
+//		Matriz k3 = Barra.k_global(modelo.getBarra("B34"));
+//		System.out.println (k3);
+//		Matriz k4 = Barra.k_global(modelo.getBarra("B35"));
+//		System.out.println (k4);
+//		Matriz kuu = modelo_aux.get_kuu();
+//		System.out.println (kuu);
+		//Matriz kGlobal = modelo_aux.get_k_total();
+		//System.out.println (kGlobal);
+		
+//testes aleatórios enquanto estudava - apagar depois		
+//		Node node = new Node("N1", 2, 0.0, 0.0, 0.0);
+//		System.out.println(node);
+//		System.out.println(node.get_id());
+//		node.set_id("N3");
+//		System.out.println(node);
+//		double [] vec = {1 , 2, 3};
+//		Vetor vec1 = new Vetor (vec);
+//		System.out.println (vec1);
+//		Vetor vec2 = new Vetor (vec);
+//		vec1.addVetor(vec2);
+//		System.out.println (vec1);
+//		Vetor vec3 = new Vetor (3);
+//		vec1.addVetor(vec1, vec2);
+//		System.out.println (vec1);
+//		double [][] mat = {
+//				{1, 2, 3},
+//				{3, 4},
+//				{5}
+//		};
+//		double [][] mat = {
+//				{1,2,3},
+//				{3,4,5},
+//				{6,7,8}
+//		};
+//		
+//		Matriz m = new Matriz (mat);
+//		m.transposta();
+//		System.out.println (m);
+//		Matriz mul = m.scale(2);
+//		System.out.println (mul);
+//		Vetor res = m.mulVetor(vec1);
+//		System.out.println (res);
+	}	
+	
+	
+
+}

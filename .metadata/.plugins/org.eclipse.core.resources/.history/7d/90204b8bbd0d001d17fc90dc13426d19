@@ -1,0 +1,580 @@
+package modelo;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+
+/** 
+ * Classe que descreve um modelo estrutural reticulado espacial
+ * <p>
+ * Dados:
+ * <ul>
+ * <li> listaNode - lista de nós que compõem o modelo estrutural
+ * <li> listaMaterial - lista de materiais que compõem o modelo estrutural
+ * <li> listaSecao - lista de seções transverais que compõem o modelo estrutural
+ * <li> listaBarra - lista de barras que compõem o modelo estrutural
+ * <li> tipoBarra - tipos das barras que compõem o modelo estrutural
+ * <li> titulo - titulo do modelo estrutural 
+ * </ul>
+ * @author Tainan Brandão
+ * @version 1.0
+ */
+
+public class Modelo {
+	
+	/**
+	 * Declaração dos campos da classe.
+	 */  		
+	private ArrayList<Node> listaNode;
+	private ArrayList<Material> listaMaterial;
+	private ArrayList<SecaoTransversal> listaSecao;
+	private ArrayList<Barra> listaBarra;
+	private String titulo = null;
+	private String tipoBarra = null;
+	
+	/**
+	 * Construtor com parâmetro para preenchimento das quantidades de nós,
+	 * materiais, seções transversais e barras que compõem o modelo estrutural.
+	 * @param titulo título do modelo estrutural 
+	 * @param tipoBarra tipo das barras do modelo estrutural (viga, pórtico ou treliça) 
+	 */	
+	public Modelo (String titulo, String tipoBarra) {
+		this.titulo=titulo;
+		this.tipoBarra = tipoBarra;
+		listaNode = new ArrayList<Node>();
+		listaMaterial = new ArrayList<Material>();
+		listaSecao = new ArrayList<SecaoTransversal>();
+		listaBarra = new ArrayList<Barra>();
+	}
+	
+	 /**
+     * Método para adicionar nós no ArrayList.
+     * @param node nó a ser adicionado no modelo
+     */
+	public void addNode(Node node) {
+		listaNode.add(node);
+	}
+	
+	 /**
+     * Método para adicionar materiais no ArrayList.
+     * @param mat material a ser adicionado no modelo
+     */
+	public void addMaterial(Material mat) {
+		listaMaterial.add(mat);
+	}
+	
+	 /**
+     * Método para adicionar seções transversais no ArrayList.
+     * @param sec seção transversal a ser adicionado no modelo
+     */
+	public void addSecao(SecaoTransversal sec) {
+		listaSecao.add(sec);
+	}
+	
+	 /**
+     * Método para adicionar barras no ArrayList.
+     * @param barra barra a ser adicionado no modelo
+     */
+	public void addBarra(Barra barra) {
+		listaBarra.add(barra);
+	}
+	  
+	/**
+	 * Método de acesso Get que retorna o tipo de barra do modelo.
+	 * @return tipoBarra
+	 */		
+	public String get_tipoBarra() {
+		return this.tipoBarra;
+	}
+	
+	/**
+	 * Método de modificação Set que modifica o tipo de barra do modelo.
+	 * @param tipoBarra tipo de barra do modelo
+	 */		
+	public void set_tipoBarra(String tipoBarra) {
+		this.tipoBarra=tipoBarra;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna o número de nós do modelo.
+	 * @return número de nós do modelo
+	 */		
+	public int get_numeroDeNodes() {
+		return listaNode.size();
+	}
+		
+	/**
+	 * Método de acesso Get que retorna o número de materiais do modelo.
+	 * @return número de materiais do modelo
+	 */	
+	public int get_numeroDeMateriais() {
+		return listaMaterial.size();
+	}
+	
+	/**
+	 * Método de acesso Get que retorna o número de seções transversais do modelo.
+	 * @return número de seções transversais do modelo
+	 */		
+	public int get_numeroDeSecoes() {
+		return listaSecao.size();
+	}
+	
+	/**
+	 * Método de acesso Get que retorna o número de barras do modelo.
+	 * @return número de barras do modelo
+	 */		
+	public int get_numeroDeBarras() {
+		return listaBarra.size();
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a lista de nós do modelo.
+	 * @return lista de nós que compõem o modelo
+	 */		
+	public ArrayList<Node>  get_listaNode () {
+		return listaNode;
+	}
+		
+	/**
+	 * Método de acesso Get que retorna a lista de materiais do modelo.
+	 * @return lista de materiais que compõem o modelo
+	 */	
+	public ArrayList<Material>  get_listaMaterial () {
+		return listaMaterial;
+	}
+		
+	/**
+	 * Método de acesso Get que retorna a lista de seções transversais do modelo.
+	 * @return lista de seções transversais que compõem o modelo
+	 */		
+	public ArrayList<SecaoTransversal>  get_listaSecao () {
+		return listaSecao;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a lista de barras do modelo.
+	 * @return lista de barras que compõem o modelo
+	 */	
+	public ArrayList<Barra>  get_listaBarra () {
+		return listaBarra;
+	}
+		
+	/**
+	 * Método de acesso Get que retorna o nó 
+	 * na posição específica (i) dentro da lista de nós (listaNode [i]).
+	 * @param i posição específica dentro da lista de nós
+	 * @return nó na posição específica dentro da lista de nós
+	 */		
+	public Node getNode(int i) {
+		if ((i>=0)&&(i<this.get_numeroDeNodes()))
+				return listaNode.get(i);
+		else {
+			System.out.println ("Método get incorreto: Tentativa de acesso em posição inexistente da lista de nós");
+			System.exit(1);
+			return null;
+		}
+	}
+	
+	/**
+	 * Método de acesso Get que retorna o material 
+	 * em uma posição específica (i) dentro da lista de materiais (listaMaterial [i]).
+	 * @param i posição específica dentro da lista de materiais
+	 * @return material em uma posição específica dentro da lista de materiais
+	 */		
+	public Material getMaterial(int i) {
+		if ((i>=0)&&(i<this.get_numeroDeMateriais()))
+				return listaMaterial.get(i);
+		else {
+			System.out.println ("Método get incorreto: Tentativa de acesso em posição inexistente da lista de materiais");
+			System.exit(1);
+			return null;
+		}
+	}
+		
+	/**
+	 * Método de acesso Get que retorna a seção transversal
+	 * em uma posição específica (i) dentro da lista de seções transversais (listaSecao [i]).
+	 * @param i posição específica dentro da lista de seções transversais
+	 * @return seção transversal em uma posição específica dentro da lista de seções transversais
+	 */		
+	public SecaoTransversal getSecao(int i) {
+		if ((i>=0)&&(i<this.get_numeroDeSecoes()))
+				return listaSecao.get(i);
+		else {
+			System.out.println ("Método get incorreto: Tentativa de acesso em posição inexistente da lista de seções transversais");
+			System.exit(1);
+			return null;
+		}
+	}
+
+	/**
+	 * Método de acesso Get que retorna a barra
+	 * em uma posição específica (i) dentro da lista de barras (listaBarra [i]).
+	 * @param i posição específica dentro da lista de barras
+	 * @return barra em uma posição específica dentro da lista de barras
+	 */		
+	public Barra getBarra (int i) {
+		if ((i>=0)&&(i<this.get_numeroDeBarras()))
+				return listaBarra.get(i);
+		else {
+			System.out.println ("Método get incorreto: Tentativa de acesso em posição inexistente da lista de barras");
+			System.exit(1);
+			return null;
+		}
+	}
+	
+	/**
+	 * Método de acesso Get que retorna o nó na posição 
+	 * do identificador do nó (id) dentro da lista de nós (listaNode [id]).
+	 * @param id identificador do nó dentro da lista de nós
+	 * @return nó na posição do identificador do nó dentro da lista de nós
+	 */	
+	public Node getNode(String id) {
+		Iterator<Node> itListaNode = this.listaNode.iterator();		
+		while (itListaNode.hasNext()) {
+			Node node_aux = itListaNode.next();
+			if (node_aux.get_id()!=null) {
+				if (node_aux.get_id().equals(id)) {
+					return node_aux;				
+				}
+			}
+		}
+		return null;
+		}
+	
+	/**
+	 * Método de acesso Get que retorna o material na posição 
+	 * do identificador do material (id) dentro da lista de materiais (listaMaterial [id]).
+	 * @param id identificador do material dentro da lista de material
+	 * @return material na posição do identificador do material dentro da lista de material
+	 */			
+	public Material getMaterial(String id) {		
+		Iterator<Material> itListaMaterial = this.listaMaterial.iterator();		
+		while (itListaMaterial.hasNext()) {			
+			Material material_aux = itListaMaterial.next();
+			if (material_aux.get_id()!=null) {
+				if (material_aux.get_id().equals(id)) {
+					return material_aux;
+				}	
+			}	
+		}
+		return null;
+		}
+	
+	/**
+	 * Método de acesso Get que retorna a seção transversal na posição 
+	 * do identificador da seção transversal (id) dentro da lista
+	 * de seções transversais (listaSecao [id]).
+	 * @param id identificador da seção transversal dentro da lista de seções transversais
+	 * @return seção transversal na posição do identificador da seção transversal dentro da lista de seções transversais
+	 */		
+	public SecaoTransversal getSecao(String id) {		
+		Iterator<SecaoTransversal> itListaSecao = this.listaSecao.iterator();		
+		while (itListaSecao.hasNext()) {			
+			SecaoTransversal secao_aux = itListaSecao.next();
+			if (secao_aux.get_id()!=null) {
+				if (secao_aux.get_id().equals(id)) {
+					return secao_aux;				
+				}
+			}
+		}
+		return null;
+		}		
+	
+	/**
+	 * Método de acesso Get que retorna a barra na posição 
+	 * do identificador da barra (id) dentro da lista de barras (listaBarra [id]).
+	 * @param id identificador da barra dentro da lista de material
+	 * @return barra na posição do identificador da barra dentro da lista de barra
+	 */	
+	public Barra getBarra(String id) {		
+		Iterator<Barra> itListaBarra = this.listaBarra.iterator();		
+		while (itListaBarra.hasNext()) {			
+			Barra barra_aux = itListaBarra.next();
+			if (barra_aux.get_id()!=null) {
+				if (barra_aux.get_id().equals(id)) {				
+					return barra_aux;
+				} 
+			}
+		}
+		return null;		
+	}
+
+		
+	/**
+	 * Método modificador Set da lista de nós 
+	 * que compõem o modelo estrutural (listaNode) (sem retorno).
+	 * @param listaNode lista de nós que compõem o modelo estrutural 
+	 */   		
+	public void set_listaNode (ArrayList<Node> listaNode) {
+		this.listaNode = listaNode;
+	}
+	
+	/**
+	 * Método modificador Set da lista de materiais 
+	 * que compõem o modelo estrutural (listaMaterial) (sem retorno).
+	 * @param listaMaterial lista de materiais que compõem o modelo estrutural 
+	 */ 		
+	public void set_listaMaterial (ArrayList<Material> listaMaterial) {
+		this.listaMaterial = listaMaterial;
+	}
+	
+	/**
+	 * Método modificador Set da lista de seções transversais
+	 * que compõem o modelo estrutural (listaSecao) (sem retorno).
+	 * @param listaSecao lista de seções transversais que compõem o modelo estrutural 
+	 */ 		
+	public void set_listaSecao (ArrayList<SecaoTransversal> listaSecao) {
+		this.listaSecao = listaSecao;
+	}
+	
+	/**
+	 * Método modificador Set da lista de barras
+	 * que compõem o modelo estrutural (listaBarra) (sem retorno).
+	 * @param listaBarra lista de barras que compõem o modelo estrutural 
+	 */ 	
+	public void set_listaBarra (ArrayList<Barra> listaBarra) {
+		this.listaBarra = listaBarra;
+	}
+
+	/**
+	 * Método modificador Set em uma posição específica (i) da lista de nós
+	 * que compõem o modelo estrutural (listaNode [i]) (sem retorno).
+	 * @param i posição específica dentro da lista de nós
+	 * @param node nó modificado
+	 */ 		
+	public void setNode (int i, Node node ) {
+		if ((i>=0)&&(i<this.get_numeroDeNodes()))
+		this.listaNode.set(i, node);		
+		else {
+			System.out.println ("Método set incorreto: Tentativa de modificação de posição inexistente da lista de nós");
+			System.exit(1);
+		}
+	}		
+		
+	/**
+	 * Método modificador Set em uma posição específica (i) da lista de materiais
+	 * que compõem o modelo estrutural (listaMaterial [i]) (sem retorno).
+	 * @param i posição específica dentro da lista de materiais
+	 * @param mat material modificado
+	 */	
+	public void setMaterial (int i, Material mat ) {
+		if ((i>=0)&&(i<this.get_numeroDeMateriais()))
+		this.listaMaterial.set(i, mat);		
+		else {
+			System.out.println ("Método set incorreto: Tentativa de modificação de posição inexistente da lista de materiais");
+			System.exit(1);
+		}
+	}
+	
+	/**
+	 * Método modificador Set em uma posição específica (i) da lista de seções transversais
+	 * que compõem o modelo estrutural (listaSecao [i]) (sem retorno).
+	 * @param i posição específica dentro da lista de seções transversais
+	 * @param sec seção transversal modificada
+	 */
+	public void setSecao (int i, SecaoTransversal sec ) {
+		if ((i>=0)&&(i<this.get_numeroDeSecoes()))
+		this.listaSecao.set(i, sec);		
+		else {
+			System.out.println ("Método set incorreto: Tentativa de modificação de posição inexistente da lista de seções");
+			System.exit(1);
+		}
+	}
+		
+	/**
+	 * Método modificador Set em uma posição específica (i) da lista de barras
+	 * que compõem o modelo estrutural (listaBarra [i]) (sem retorno).
+	 * @param i posição específica dentro da lista de barras
+	 * @param bar barra modificada
+	 */			
+	public void setBarra (int i, Barra bar ) {
+		if ((i>=0)&&(i<this.get_numeroDeBarras()))
+		this.listaBarra.set(i, bar);		
+		else {
+			System.out.println ("Método set incorreto: Tentativa de modificação de posição inexistente da lista de barras");
+			System.exit(1);
+		}
+	}
+
+	/**
+	 * Método modificador Set na posição do identificador do nó (id) dentro da lista de nós
+	 * que compõem o modelo estrutural (listaNode [i]) (sem retorno).
+	 * @param id identificador do nó dentro da lista de nós
+	 * @param n nó modificado
+	 */		
+	public void setNode (String id, Node n ) {		
+		if (this.procurar_Node(id)==false) {
+			System.out.println("Método set incorreto: O nó de id procurado não foi encontrado");
+			System.exit(1);			
+		}
+	
+		Iterator<Node>itListaNode = this.listaNode.iterator();	
+		while (itListaNode.hasNext()) {	
+			Node node_aux = itListaNode.next();		
+			if (node_aux.get_id().equals(id)) {				
+				this.listaNode.set(this.listaNode.indexOf(node_aux), n);			
+			}		
+		}
+	}				
+			
+	/**
+	 * Método modificador Set na posição do identificador do material (id) dentro da 
+	 * lista de materiais que compõem o modelo estrutural (listaMaterial [i]) (sem retorno).
+	 * @param id identificador do material dentro da lista de materiais
+	 * @param mat material modificado
+	 */	
+	public void setMaterial (String id, Material mat ) {
+		if (this.procurar_Material(id)==false) {
+			System.out.println("Método set incorreto: O material de id procurado não foi encontrado");
+			System.exit(1);			
+		}
+		
+		Iterator<Material>itListaMaterial = this.listaMaterial.iterator();	
+		while (itListaMaterial.hasNext()) {	
+			Material mat_aux = itListaMaterial.next();		
+			if (mat_aux.get_id().equals(id)) {				
+				this.listaMaterial.set(this.listaMaterial.indexOf(mat_aux), mat);			
+			}		
+		}
+	}	
+	
+	/**
+	 * Método modificador Set na posição do identificador da seção transversal (id) dentro da 
+	 * lista de seções transversais que compõem o modelo estrutural (listaSecao [i]) (sem retorno).
+	 * @param id identificador da seção transversal dentro da lista de seções transversais
+	 * @param sec seção transversal modificada
+	 */
+	public void setSecao (String id, SecaoTransversal sec ) {
+		if (this.procurar_Secao(id)==false) {
+			System.out.println("Método set incorreto: A seção de id procurada não foi encontrada");
+			System.exit(1);			
+		}
+		Iterator<SecaoTransversal>itListaSecao = this.listaSecao.iterator();	
+		while (itListaSecao.hasNext()) {	
+			SecaoTransversal sec_aux = itListaSecao.next();		
+			if (sec_aux.get_id().equals(id)) {				
+				this.listaSecao.set(this.listaSecao.indexOf(sec_aux), sec);			
+			}		
+		}
+	}	
+
+	/**
+	 * Método modificador Set na posição do identificador da barra (id) dentro da 
+	 * lista de barras que compõem o modelo estrutural (listaBarra [i]) (sem retorno).
+	 * @param id identificador da barra dentro da lista de barras
+	 * @param bar barra modificada
+	 */		
+	public void setBarra (String id, Barra bar ) {
+		if (this.procurar_Barra(id)==false) {
+			System.out.println("Método set incorreto: A barra de id procurada não foi encontrada");
+			System.exit(1);			
+		}
+		
+		Iterator<Barra>itListaBarra = this.listaBarra.iterator();	
+		while (itListaBarra.hasNext()) {	
+			Barra bar_aux = itListaBarra.next();		
+			if (bar_aux.get_id().equals(id)) {				
+				this.listaBarra.set(this.listaBarra.indexOf(bar_aux), bar);			
+			}		
+		}
+	}
+	
+	/**
+	 * Método que retorna o número de graus de liberdade do nó em função do tipo de barra.
+	 * @return n_DOF número de graus de liberdade do nó da barra
+	 */
+	public  int get_n_DOF() {
+    	int n_DOF;    	
+    	switch(this.tipoBarra)
+    	{
+    	case("Truss"):
+    		n_DOF = 2;
+    	break;
+    	default:
+    		System.out.println("Tipo de barra não previsto.");
+    		n_DOF = 0;
+    		System.exit(1);
+    	}
+    	return n_DOF;
+    }
+
+	/**
+	 * Método que retorna um booleano para verificar se o identificador do nó (id)
+	 * já foi utilizado anteriormente na lista de nós.
+	 * @param id identificador do nó dentro da lista de nós
+	 * @return verdadeiro quando já existe um nó com o idenficador do nó fornecido, 
+	 * falso para o contrário
+	 */		
+	public boolean procurar_Node (String id) {		
+		if (listaNode.contains(this.getNode(id)) && (this.getNode(id)!=null)) {
+			return true;//como o contais já verifica se existe aquele objeto e no arraylist não 				
+		}	            //fica armazenado como null, pq vai crescendo o array conforme adiciona barra
+		return false;	//não acha necessidade de verificar se o objeto é null			
+	}			        //mas o id é importante verificar, senão dá problema no getNode(id)
+	
+	/**
+	 * Método que retorna um booleano para verificar se o identificador do material (id)
+	 * já foi utilizado anteriormente na lista de materiais.
+	 * @param id identificador do material dentro da lista de material
+	 * @return verdadeiro quando já existe um material com o idenficador do material fornecido, 
+	 * falso para o contrário
+	 */		
+	public boolean procurar_Material (String id) {
+		if (listaMaterial.contains(this.getMaterial(id)) && (this.getMaterial(id)!=null)) {
+			return true;				
+		}			
+		return false;					
+	}
+	
+	/**
+	 * Método que retorna um booleano para verificar se o identificador da seção transversal (id)
+	 * já foi utilizado anteriormente na lista de seções transversais.
+	 * @param id identificador da seção transversal dentro da lista de seções transversais
+	 * @return verdadeiro quando já existe uma seção transversal com o idenficador 
+	 * da seção transversal fornecida, falso para o contrário
+	 */		
+	public boolean procurar_Secao (String id) {		
+		if (listaSecao.contains(this.getSecao(id)) && (this.getSecao(id)!=null)) {
+			return true;				
+		}	
+		return false;					
+	}	
+	
+	/**
+	 * Método que retorna um booleano para verificar se o identificador da barra (id)
+	 * já foi utilizado anteriormente na lista de barras.
+	 * @param id identificador da barra dentro da lista de barras
+	 * @return verdadeiro quando já existe uma barra com o idenficador 
+	 * da barra fornecida, falso para o contrário
+	 */		
+	public boolean procurar_Barra (String id) {
+		if (listaBarra.contains(this.getBarra(id)) && (this.getBarra(id)!=null)) {
+			return true;				
+		}	
+		return false;		
+	}	
+	
+	
+	/**
+	 * Método que retorna um texto contendo os dados do modelo: 
+	 * barras descritas por nós iniciais e finais associados a coordenadas x, y z
+	 * materiais descritos pelo módulo de elasticidade e coeficiente de poisson
+	 * seções descritas pela área e momento de inércia da seção transversal.
+	 * @return Texto contendo os dados do modelo
+	 */	
+	public String toString () {
+    	String texto;
+    	texto = titulo + "\n";
+    	texto += "\n___________________DADOS DE ENTRADA___________________\n";
+    	texto += "Barras do modelo estrutural do tipo: " + tipoBarra + "\n";
+    	texto += "Número de nós: " + this.get_numeroDeNodes() + "\n";
+    	texto += "Número de materiais: " + this.get_numeroDeMateriais() + "\n";
+    	texto += "Número de seções: " + this.get_numeroDeSecoes() + "\n";
+    	texto += "Número de barras: " + this.get_numeroDeBarras() + "\n";
+    	for (int i=0; i<get_numeroDeBarras(); i++) {
+    		texto += listaBarra.get(i) + " ";
+    	}
+    	return texto;	
+    }
+
+} 

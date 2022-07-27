@@ -1,0 +1,20 @@
+package structureLoad;
+import algebraLinear.Vetor;
+
+/** 
+ * Interface que caracteriza o carregamento equivalente de uma carga distribuída de uma barra.
+ * descreve os métodos necessários em classes cuja interface é implementada,
+ * herdando os métodos da classe EquivalentLoad.
+ * @author Ana Paula Moura, Eduarda Marques, Tainan Brandão
+ * @version 1.0
+ */
+public interface DistributedEquivalentLoad extends EquivalentLoad {//filha de EquivalenteLoad
+		
+	/**
+	 * Método abstrato de acesso Get que retorna as forças equivalentes nos nós iniciais e finais, 
+	 * oriundas de cargas distribuídas aplicadas ao longo da barra.
+	 * @return EquivalentLoadFromQ vetor com as forças equivalentes devido as cargas Q
+	 */
+	public abstract Vetor getEquivalentLoadFromQ ();
+
+}

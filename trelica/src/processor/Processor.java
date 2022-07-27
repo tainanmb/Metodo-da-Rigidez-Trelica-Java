@@ -1,0 +1,62 @@
+package processor;
+import modelo.*;
+
+import java.util.Iterator;
+
+import algebraLinear.*;
+
+
+/** 
+ * Classe que efetua o processamento de dados de um modelo estrutural reticulado espacial,
+ * resolvendo o problema estrutural montado em formato matricial: soluciona o modelo e 
+ * calcula os deslocamentos nodais.
+ * @author Tainan Brandão
+ * @version 1.0
+ */
+
+public class Processor {
+	
+    /**
+     * Método resolve o problema matricial da estrutura.
+     * @param modelo variável do tipo modelo
+     */
+	public static void solverModel(Modelo modelo) {//Calcula os deslocamentos não prescritos		
+		
+		Assembler assembler = new Assembler(modelo);
+		
+		//vetor_B = fp - kup*dp
+        //vetor_B lá do linear_equation
+		Vetor kup_dp = assembler.get_kup().mulVetor(assembler.get_Dp()); 		
+		kup_dp.scale(-1);			
+		Vetor fp = assembler.get_Fp();
+		Vetor vetor_B = fp;		
+		vetor_B.addVetor(kup_dp);	
+		
+		//kuu*du = vetor_B = fp - kup*dp
+		Vetor du = LinearEquationSystem.SolverEquation(assembler.get_kuu(), vetor_B);	//X lá do linear_equation	
+		setNodalDisplacements(modelo,du);	//método que seta os deslocamentos dos nós sem restrição			
+	}	
+	
+
+    /**
+     * Método modificador Set dos dislocamentos nodais.      
+     * @param modelo variável do tipo modelo
+     * @param deslocamentos deslocamentos nodais
+     */
+	public static void setNodalDisplacements(Modelo modelo, Vetor deslocamentos) {		
+		
+		Iterator<Node>itListaNode = modelo.get_listaNode().iterator();	
+		int k = 0;
+		while (itListaNode.hasNext()) {	
+			Node node_aux = itListaNode.next();		
+			for (int j=0; j<modelo.get_n_DOF(); j++) {
+				if (modelo.getNode(node_aux.get_id()).get_equacao(j)>0) {					
+					modelo.getNode(node_aux.get_id()).set_deslocamento(deslocamentos.getVetor(k),j );					
+					k++;
+				}
+			}
+		}
+	}
+}
+						
+	

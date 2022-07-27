@@ -1,0 +1,66 @@
+package modelo;
+
+/**
+ * Interface que caracteriza o comportamento de uma seção transversal qualquer,
+ * descreve os métodos necessários em classes cuja interface é implementada.
+ * 
+ * @author Tainan Brandão
+ * @version 1.0
+ */
+
+public interface SecaoTransversal { 
+
+	/**
+	 * Método de acesso Get que retorna o identificador da seção transversal (id).
+	 * 
+	 * @return identificador da seção transversal
+	 */
+	public String get_id();
+
+	/**
+	 * Método de acesso Get que retorna a área da seção transversal (A).
+	 * 
+	 * @return área da seção transversal
+	 */
+	public double get_A();
+
+	/**
+	 * Método de acesso Get que retorna o momento de inércia da seção transversal
+	 * (I).
+	 * 
+	 * @return momento de inércia da seção transversal
+	 */
+	public double get_I();
+
+	/**
+	 * Método modificador Set do identificador da seção transversal (id) (sem
+	 * retorno).
+	 * 
+	 * @param id identificador da seção transversal
+	 */
+	public void set_id(String id);
+
+	/**
+	 * Método modificador Set da área da seção transversal (A) (sem retorno).
+	 * 
+	 * @param A área da seção transversal
+	 */
+	public void set_A(double A);
+
+	/**
+	 * Método modificador Set do momento de inércia da seção transversal (I) (sem
+	 * retorno).
+	 * 
+	 * @param I momento de inércia da seção transversal
+	 */
+	public void set_I(double I);
+
+	/**
+	 * Método que retorna um texto contendo os dados da seção transversal:
+	 * identificador (id), área (A) e momento de inércia (I).
+	 * 
+	 * @return Texto contendo os dados da seção transversal
+	 */
+	public String toString();
+
+}

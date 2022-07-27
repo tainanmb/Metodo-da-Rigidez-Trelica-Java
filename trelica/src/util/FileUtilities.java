@@ -1,0 +1,93 @@
+package util;
+
+import java.awt.Font; // Abstract Window Toolkit - núcleo da JFC (Java Foundation Classes)
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+
+import javax.swing.JFileChooser;  // Bblioteca com classes para a criação de componentes de interface visual
+import javax.swing.JFrame;
+
+
+public class FileUtilities {
+
+	
+	
+	public static String getFileName() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFont(new Font("Arial", Font.PLAIN, 12));
+		String path = "E:\\Workspace\\Java\\calculo_trelica";
+		JFrame parent = new JFrame();
+		parent.setAlwaysOnTop(true);
+
+		fileChooser.setCurrentDirectory(new File(path));		
+		fileChooser.showDialog(parent, "Choose File");
+		path = fileChooser.getSelectedFile().getAbsolutePath();
+	
+		fileChooser.setVisible(false);
+		parent.dispose();	
+		
+		return path;
+		}	
+	
+	
+	public static FileReader createFileReader(String fileName) throws Exception {
+		FileReader fi = null;
+		try {
+			fi = new FileReader(fileName);		// Construtor da instância a um arquivo de leitura
+		} catch (Exception e) {
+			String msg = "ERRO DE LEITURA DE DADOS!!!\n" + e.getMessage();
+			System.out.println(msg);
+		}
+		return fi;
+	}
+	
+	
+	public static FileWriter openFileWriter(String fileName){
+		FileWriter fout = null;
+		try {
+			fout = new FileWriter(fileName);		// Construtor da instância a um arquivo de escrita
+		} catch (Exception e) {
+			String msg = "ERRO DE LEITURA DE DADOS!!!\n" + e.getMessage();
+			System.out.println(msg);
+		}
+		return fout;
+	}	
+	
+		
+	public static String findLineStartingWithString(FileReader fi, String s) {
+		String temp = "";
+		do {
+			try {
+				temp = leLinha(fi);
+			} catch (Exception e) {
+				return null;
+			}
+		} while (!temp.startsWith(s));
+		return temp;
+	}
+	
+	public static String leLinha(FileReader fi) throws Exception {
+	try {
+		String temp = "";
+		int ret = 0;
+		char tc;
+		ret = fi.read();		
+		do {
+			tc = (char) ret;
+			temp += tc;
+			ret = fi.read();			
+		} while ((ret != '\n') && (ret != -1)); 
+		if (ret!=-1)
+			return temp;
+		else {
+			System.out.println("Fim do arquivo");
+			return temp;
+		}
+	} catch (Exception e) {
+		String msg = "ERRO DE LEITURA DE DADOS!!!\n" + e.getMessage();
+		throw new Exception(msg);
+	}
+} 	
+
+}

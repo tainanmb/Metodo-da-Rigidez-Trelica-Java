@@ -1,0 +1,328 @@
+package modelo;
+import algebraLinear.Matriz;
+import algebraLinear.Vetor;
+import structureLoad.DistributedEquivalentLoad;
+import structureLoad.PointEquivalentLoad;
+import structureLoad.PointLoad;
+import structureLoad.DistributedLoad;
+import java.util.Iterator;
+
+/** 
+ * Subclasse da classe abstrata Barra. Descreve uma barra do tipo Viga utilizada em 
+ * um modelo estrutural reticulado espacial.
+ * <p>
+ * Dados:
+ * <ul>
+ * <li> id - Identificador da Barra do tipo Viga
+ * <li> no_inicial - Nó Inicial da Barra do tipo Viga
+ * <li> no_final - Nó Final da Barra do tipo Viga
+ * <li> mat_bar - Material da Barra do tipo Viga
+ * <li> sec_bar - Seção Transversal da Barra do tipo Viga
+ * <li> q_list -  Lista de carregamentos distribuidos
+ * <li> p_list - Lista de carregamentos pontuais
+ * </ul>
+ * @author Ana Paula Moura, Eduarda Marques, Tainan Brandão
+ * @version 1.0
+ */
+
+public class Viga extends Barra implements DistributedEquivalentLoad, PointEquivalentLoad {
+// As filhas da barra, como essa viga, pro exemplo, quando não forem abstratas, devem implementar 
+//os métodos das interfaces que a mãe implementa e ainda quaisquer métodos de classes que estas classe implementem
+// além, claro, dos métodos da classe mãe
+	/**
+	 * Construtor sem parâmetro. Utiliza o construtor sem parâmetro da classe Barra. 
+	 */
+	public Viga() { 
+		super();
+	}
+	
+	/**
+	 * Construtor que recebe como argumento o identificador (id), nó inicial (no_inicial), nó final (no_final), material (mat_bar) e seção transversal (sec_bar) e preenche todos os campos da barra do tipo Pórtico.
+	 * Utiliza o construtor com parâmetros da classe Barra.	 
+	 * @param id identificador da barra
+	 * @param no_inicial nó inicial da barra
+	 * @param no_final nó final da barra
+	 * @param mat_bar material da barra
+	 * @param sec_bar I seção transversal da barra
+	 */	
+	public Viga(String id, Node no_inicial, Node no_final, Material mat_bar, SecaoTransversal sec_bar ) {
+		super(id,no_inicial,no_final,mat_bar,sec_bar);
+	}
+
+	/**
+	 * Método para cálculo da matiz de rigidez local de uma barra tipo viga.
+	 * @return k_local matriz de rigidez local de uma barra tipo viga
+	 */	
+	public Matriz k_local () {
+		double E = get_mat_bar().get_E();
+		double I = get_sec_bar().get_I();
+		double L = calcL(get_no_inicial(), get_no_final());	
+		double [][] k_loc = {
+			      {12*E*I/Math.pow(L, 3), 6*E*I/Math.pow(L, 2), -12*E*I/Math.pow(L, 3), 6*E*I/Math.pow(L, 2)},
+			      {6*E*I/Math.pow(L, 2), 4*E*I/L, -6*E*I/Math.pow(L, 2), 2*E*I/L},
+			      {-12*E*I/Math.pow(L, 3), -6*E*I/Math.pow(L, 2), 12*E*I/Math.pow(L, 3), -6*E*I/Math.pow(L, 2)},
+			      {6*E*I/Math.pow(L, 2), 2*E*I/L, -6*E*I/Math.pow(L, 2), 4*E*I/L},
+		};
+		Matriz k_local = new Matriz (k_loc);
+		return k_local;			
+	}
+	
+	/**
+	 * Método para cálculo da matriz de transformação de coordenadas globais para
+	 * locais de uma barra tipo pórtico.
+	 * @return transf matriz de transformação 
+	 */			
+	public Matriz transf () {
+		double [][] tr = {
+			      {1, 0, 0, 0},
+			      {0, 1, 0, 0},
+			      {0, 0, 1, 0},
+			      {0, 0, 0, 1},
+		};
+		Matriz transf = new Matriz (tr);		
+		return transf;
+	}
+	
+	
+	/**
+	 * Método de acesso Get que retorna as forças equivalentes nos nós iniciais e finais, oriundas de 
+	 * cargas concentradas aplicadas ao longo da barra.
+	 * @return EquivalentLoadFromP vetor com as forças equivalentes devido as cargas P
+	 */	
+	public Vetor getEquivalentLoadFromP() {
+	
+		Vetor EquivalentLoadFromP = new Vetor (4);
+		Vetor EquivalentLoadFromP_aux = new Vetor (4);
+		double fy_inicial, m_inicial, fy_final, m_final;
+		
+		//cálculo da carga equivalente por carga pontual de i carregamentos	
+		Iterator<PointLoad> itPLoad = this.get_p_load_list().iterator();
+		while (itPLoad.hasNext()) {
+			
+			PointLoad pload = itPLoad.next();
+			
+			double L = calcL(get_no_inicial(), get_no_final());
+			//ajuste da convenção de sinais do carregamento
+			//-fy - arquivo de entrada positivo pra cima - tabela positivo pra baixo
+			//+m - arquivo de entrada positivo anti horário - tabela positivo anti horário				
+			double fy = -(pload.get_fy());			
+			double m = pload.get_momento();
+			double a = pload.get_Position(); 
+			double b = L - a;					
+		
+			//reações que equilibram o carregamento concentrado vertical
+			double ma_fy = fy*a*b*b/(L*L);
+			double mb_fy = -fy*a*a*b/(L*L);
+			double ra_fy = fy*b/L + ma_fy/L + mb_fy/L;		
+			double rb_fy = fy - ra_fy;
+			
+			//reações que equilibram o momento concentrado
+			double ma_m = m*b*(2*a-b)/(L*L);
+			double mb_m = m*a*(2*b-a)/(L*L);
+			double ra_m = m/L+ma_m/L+mb_m/L;		
+			double rb_m = -ra_m;
+			
+			//reações que equilibram o carregamento concentrado fy + m	
+			//nó inicial		
+			fy_inicial = ra_fy + ra_m;
+			m_inicial = ma_fy + ma_m;
+			//no final
+			fy_final = rb_fy + rb_m;
+			m_final = mb_fy + mb_m;								
+			
+			//ajuste da convenção de sinais das reações
+			//inverter o sinal do vetor resultante para forças em y e momentos
+			//as forças nodais equivalentes tem sentido oposto as reações				
+			//na carga horizontal o oposto da reação coincide com o sentido positivo						
+			EquivalentLoadFromP_aux.setVetor(0, -fy_inicial);
+			EquivalentLoadFromP_aux.setVetor(1, -m_inicial);
+			EquivalentLoadFromP_aux.setVetor(2, -fy_final);
+			EquivalentLoadFromP_aux.setVetor(3, -m_final);
+						
+			//vetor final que acumula as cargas equivalentes
+			//Pois o EquivalentLoadFromP_aux é alterado a cada iteração i			
+			EquivalentLoadFromP.addVetor(EquivalentLoadFromP_aux);
+		}
+	
+		return EquivalentLoadFromP;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna as forças equivalentes nos nós iniciais e finais, oriundas de 
+	 * cargas distribuídas horizontais e inclinadas aplicadas ao longo da barra.
+	 * @return EquivalentLoadFromQ vetor com as forças equivalentes devido as cargas Q
+	 */	
+	public Vetor getEquivalentLoadFromQ() {
+				
+		Vetor EquivalentLoadFromQ = new Vetor (4);
+		Vetor EquivalentLoadFromQ_aux = new Vetor (4);
+		double fy_inicial, m_inicial, fy_final, m_final;
+		
+		//cálculo da carga equivalente por carga distrubuída de i carregamentos
+		Iterator<DistributedLoad> itQLoad = this.get_q_load_list().iterator();
+		while (itQLoad.hasNext()) {
+			
+			DistributedLoad qload = itQLoad.next();
+			
+			//ajuste da convenção de sinais do carregamento
+			//-qy - arquivo de entrada positivo pra cima - tabela positivo pra baixo		
+			double L = calcL(get_no_inicial(), get_no_final());
+			double qi = -(qload.get_InicalLoad());
+			double qf = -(qload.get_FinalLoad());	
+			double pos_i = qload.get_InicialPosition(); 
+			double pos_f = qload.get_FinalPosition(); 	
+			
+					
+			//reações que equilibram o carregamento distribuído retangular
+			double p_retangular;
+			if (Math.abs(qi)<Math.abs(qf)) {
+				p_retangular = qi;			
+			} else {		
+				p_retangular = qf;			
+			}		
+			
+			double c_retangular = pos_f - pos_i;
+			double a_retangular = pos_i + c_retangular/2;		
+			double b_retangular = L - a_retangular;		
+			
+			double ma_retangular = 	
+					(p_retangular*c_retangular/(12*L*L))*				
+					(12*a_retangular*Math.pow(b_retangular,2)+
+							Math.pow(c_retangular, 2)*(L-3*b_retangular));							
+			
+			double mb_retangular = 	
+					(-p_retangular*c_retangular/(12*L*L))*				
+					(12*Math.pow(a_retangular,2)*b_retangular+
+							Math.pow(c_retangular, 2)*(L-3*a_retangular));
+			
+			double ra_retangular = 
+					p_retangular*c_retangular*b_retangular/L+
+					ma_retangular/L+
+					mb_retangular/L;
+			
+			double rb_retangular = 
+					p_retangular*c_retangular-ra_retangular;			
+			
+			//reações que equilibram o carregamento distribuído triangular
+			double p_triangular;
+			double c_triangular = pos_f - pos_i;
+			double a_triangular;
+			double b_triangular;
+			
+			if (Math.abs(qi)<Math.abs(qf)) {
+				p_triangular = qf - qi;		
+				a_triangular = pos_i;
+				b_triangular = L - c_triangular - a_triangular;
+			} else {		
+				p_triangular = qi - qf;			
+				b_triangular = pos_i;
+				a_triangular = L - c_triangular - b_triangular;
+			}		
+			
+			double ma_triangular; 
+			double mb_triangular; 
+			double ra_triangular;
+			double rb_triangular;
+					
+			double ma_triangular_aux = 						
+					(p_triangular*c_triangular/(60*L*L))*
+					(10*Math.pow(b_triangular, 2)*(3*a_triangular+2*c_triangular)+
+							Math.pow(c_triangular, 2)*(10*b_triangular+5*a_triangular+2*c_triangular)+
+							20*a_triangular*b_triangular*c_triangular);
+					
+			double  mb_triangular_aux = 				
+					(-p_triangular*c_triangular/(60*L*L))*
+					(10*Math.pow(a_triangular, 2)*(3*b_triangular+c_triangular)+
+							Math.pow(c_triangular, 2)*(15*b_triangular+10*a_triangular+3*c_triangular)+
+							40*a_triangular*b_triangular*c_triangular);
+			 
+			double ra_triangular_aux = 
+					(p_triangular*c_triangular/(2*L))*(b_triangular+c_triangular/3)
+					+ma_triangular_aux/L
+					+mb_triangular_aux/L;
+				
+			double  rb_triangular_aux = 
+					p_triangular*c_triangular/2 - ra_triangular_aux;
+			
+			//nos casos que a carga inicial é maior que a carga final
+			//as reações a e b devem ser invertidas
+			//os momentos a e b devem ser invertidos e seus sinais trocados
+			if (Math.abs(qi)<Math.abs(qf)) {			
+				ma_triangular = ma_triangular_aux; 
+				mb_triangular = mb_triangular_aux;  
+				ra_triangular = ra_triangular_aux; 
+				rb_triangular = rb_triangular_aux; 
+				
+			} else {		
+				ma_triangular = -mb_triangular_aux; 
+				mb_triangular = -ma_triangular_aux;  
+				ra_triangular = rb_triangular_aux; 
+				rb_triangular = ra_triangular_aux; 
+			}
+					
+			//reações que equilibram o carregamento distribuído triangular + retangular	
+			//no inicial	
+			fy_inicial = ra_triangular + ra_retangular;
+			m_inicial = ma_triangular + ma_retangular;				
+			//nó final			
+			fy_final = rb_triangular + rb_retangular;
+			m_final = mb_triangular + mb_retangular;
+				
+			//montagem do vetor equivalente as cargas equivalentes da iteração i 
+			
+			//ajuste da convenção de sinais das reações
+			//inverter o sinal do vetor resultante para forças em y e momentos
+			//as forças nodais equivalentes tem sentido oposto as reações				
+			//na carga horizontal o oposto da reação coincide com o sentido positivo		
+			EquivalentLoadFromQ_aux.setVetor(0, -fy_inicial);
+			EquivalentLoadFromQ_aux.setVetor(1, -m_inicial);
+			EquivalentLoadFromQ_aux.setVetor(2, -fy_final);
+			EquivalentLoadFromQ_aux.setVetor(3, -m_final);
+						
+			//vetor final que acumula as cargas equivalentes
+			//Pois o EquivalentLoadFromP_aux é alterado a cada iteração i			
+			EquivalentLoadFromQ.addVetor(EquivalentLoadFromQ_aux);
+			
+		}
+
+		return EquivalentLoadFromQ;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna as forças equivalentes nos nós iniciais e finais, oriundas do
+	 * somatório de cargas pontuais e distribuídas aplicadas ao longo da barra no sistema
+	 * de coordenadas local.
+	 * @return EquivalentLoadLocal vetor com as forças equivalentes total no sistema local
+	 */		
+	public Vetor getEquivalentLoadLocal() {
+		Vetor EquivalentLoadLocal = new Vetor (4);			
+		EquivalentLoadLocal.addVetor(getEquivalentLoadFromP(), getEquivalentLoadFromQ());		
+		return EquivalentLoadLocal;
+	}
+	
+	/**
+	 *  Método de acesso Get que retorna as forças equivalentes nos nós iniciais e finais, oriundas do
+	 * somatório de cargas pontuais e distribuídas aplicadas ao longo da barra no sistema
+	 * de coordenadas global.
+	 * @return EquivalentLoadLocal vetor com as forças equivalentes total no sistema global
+	 */	
+	public Vetor getEquivalentLoadGlobal () {
+		Vetor EquivalentLoadGlobal = new Vetor (4);
+		Matriz transftransposta = Matriz.transposta(this.transf());		
+		EquivalentLoadGlobal = Matriz.mulVetor(transftransposta, getEquivalentLoadLocal());		
+		return EquivalentLoadGlobal;		
+	}		
+	
+	/**
+	 * Método de acesso Get que retorna um vetor com os deslocamentos da barra
+	 * @return Deslocamento vetor com os deslocamentos da barra
+	 */	
+	public Vetor get_deslocamentos() {
+		Vetor Deslocamento = new Vetor (4);
+		Deslocamento.setVetor(0, this.get_no_inicial().get_deslocamento(0));
+		Deslocamento.setVetor(1, this.get_no_inicial().get_deslocamento(1));
+		Deslocamento.setVetor(2, this.get_no_final().get_deslocamento(0));
+		Deslocamento.setVetor(3, this.get_no_final().get_deslocamento(1));
+		return Deslocamento;
+	}
+  }

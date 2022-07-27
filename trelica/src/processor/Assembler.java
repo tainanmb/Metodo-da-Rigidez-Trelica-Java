@@ -1,0 +1,480 @@
+package processor;
+
+import modelo.*;
+
+import java.util.Iterator;
+
+import algebraLinear.*;
+
+/**
+ * Classe que efetua o processamento de dados de um modelo estrutural reticulado
+ * espacial, efetuando a montagem do problema estrutural em formato matricial.
+ * Dados:
+ * <ul>
+ * <li>modelo - variável do tipo Modelo;
+ * <li>n_DOF - número de graus de liberdade livres do modelo;
+ * <li>n_reacoes - número de reações de apoio do modelo.
+ * </ul>
+ * 
+ * @author Tainan Brandão
+ * @version 1.0
+ */
+
+public class Assembler {
+
+	/**
+	 * Declaração dos campos da classe.
+	 */
+	public Modelo modelo;
+	public int n_reacoes = 0; // Número total de restrições do modelo
+	public int n_DOF = 0; // Número total de graus de liberdade do modelo
+
+	/**
+	 * Construtor sem parâmetro
+	 */
+	public Assembler() {
+		this.modelo = null;
+	}
+
+	/**
+	 * Construtor que recebe como argumento um objeto do tipo modelo e numera as
+	 * equações do problema.
+	 * 
+	 * @param modelo variável do tipo modelo
+	 */
+	public Assembler(Modelo modelo) {
+		this.modelo = modelo;
+		this.number_equations();// quando cria o assembler já numera automaticamente as equações
+	} // Então quando mandar imprimir o modelo as equações já são setadas
+
+	/**
+	 * Método que numera as equações nodais do modelo (sem retorno), positivo para
+	 * deslocamentos livres e negativo para deslocamentos impedidos (reações de
+	 * apoio).
+	 */
+	public void number_equations() {
+		Iterator<Node> itListaNode = modelo.get_listaNode().iterator();
+		while (itListaNode.hasNext()) {// o while percorre a lista de nós
+			Node node_aux = itListaNode.next();
+			for (int j = 0; j < modelo.get_n_DOF(); j++) { // o for percorre a lista de restrições do nó
+				if (modelo.getNode(node_aux.get_id()).get_restricao(j) == true) {
+//               if (modelo.getNode(modelo.get_listaNode().indexOf(node_aux)).get_restricao(j)==true)  //outra maneira
+					n_reacoes = n_reacoes - 1; // começou com 0
+					modelo.getNode(node_aux.get_id()).set_equacao(n_reacoes, j);
+				}
+				if (modelo.getNode(node_aux.get_id()).get_restricao(j) == false) {
+					n_DOF = n_DOF + 1;// começou com 0
+					modelo.getNode(node_aux.get_id()).set_equacao(n_DOF, j);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Método que altera o modelo fornecido outro modelo como argumento.
+	 * 
+	 * @param modelo variável do tipo modelo
+	 */
+	public void set_Modelo(Modelo modelo) {
+		this.modelo = modelo;
+	}
+
+	/**
+	 * Método que retorna o modelo.
+	 * 
+	 * @return modelo
+	 */
+	public Modelo get_Modelo() {
+		return this.modelo;
+	}
+
+	/**
+	 * Método que retorna o número de reações de apoio, retorna um número positivo.
+	 * 
+	 * @return aux número de reações de apoio
+	 */
+	public int get_n_Reacoes() {
+		int aux = this.n_reacoes * (-1);// Já sai positivo
+		return aux;
+	}
+
+	/**
+	 * Método que retorna o número de graus de liberdade.
+	 * 
+	 * @return graus de liberdade do modelo
+	 */
+	public int get_n_DOF() {
+		return this.n_DOF;
+	}
+
+	/**
+	 * Método que calcula e retorna a Matriz kuu
+	 * 
+	 * @return kuu matriz kuu
+	 */
+	public Matriz get_kuu() {
+		Matriz kuu = new Matriz(this.n_DOF, this.n_DOF);// numero de graus de liberdade total do modelo
+
+		Iterator<Barra> itListaBarra = modelo.get_listaBarra().iterator();
+		while (itListaBarra.hasNext()) {// percorre a lista de barras com o iterador
+			Barra bar_aux = itListaBarra.next(); // o iterador vai percorrendo em ordem
+
+			Matriz k_global = Barra.k_global(bar_aux);
+
+			int[] equacao = new int[2 * modelo.get_n_DOF()];// array com as equações do nó incial e final da barra
+
+			int[] aux1 = new int[modelo.get_n_DOF()];
+			int[] aux2 = new int[modelo.get_n_DOF()];
+			aux1 = modelo.getBarra(bar_aux.get_id()).get_no_inicial().get_equacoes();// array com equações do no incial
+			aux2 = modelo.getBarra(bar_aux.get_id()).get_no_final().get_equacoes();// array com equacoes do no final
+
+			for (int i = 0; i < modelo.get_n_DOF(); i++) {// pega as equações[0] e [1] do nó incial e seta no array de
+															// equacoes
+				equacao[i] = aux1[i]; // ou [0][1][2] se for dof 3
+			}
+
+			for (int i = modelo.get_n_DOF(); i < equacao.length; i++) {// pega as equações[2] e [3] do nó final e seta
+																		// no array de equacoes
+				equacao[i] = aux2[i - modelo.get_n_DOF()]; // ou [3][4][5] se for dof 3
+			}
+
+			int n_DOF_barra = 0; // numero de graus de liberdade da barra
+
+			for (int i = 0; i < equacao.length; i++) {
+				if (equacao[i] > 0)// a partir domeu array de equações posso olhar quantos graus de liberdade tem a
+									// barra
+					n_DOF_barra = n_DOF_barra + 1; // ou seja, quantas equações positivas
+			}
+
+			int[] pos_k_global = new int[n_DOF_barra]; // array posição da k global da barra que vou pegar pra fazer kuu
+			int[] pos_kuu = new int[n_DOF_barra]; // array posição da kuu que vou setar
+			int k = 0;// contador
+
+			for (int i = 0; i < equacao.length; i++) {
+				if (equacao[i] > 0) {
+					pos_k_global[k] = i;// posição na k_global
+					pos_kuu[k] = equacao[i] - 1;// posição na kuu
+					k++;// conta a quantidade de elementos que terá na minha kuu vindo dessa barra
+				}
+			}
+
+			for (int q = 0; q < pos_kuu.length; q++) {// vai ser sempre quadrado
+				for (int p = 0; p < pos_kuu.length; p++) {// não podia ter feito um for só, senão ia ficar sempre os
+															// termos quadrados da diagonal
+					kuu.setMatriz(pos_kuu[q], pos_kuu[p], kuu.getMatriz(pos_kuu[q], pos_kuu[p])
+							+ k_global.getMatriz(pos_k_global[q], pos_k_global[p]));
+				} // aqui faz a função+=, pq tem que acumular os números
+			}
+		}
+
+		return kuu;
+	}
+
+	/**
+	 * Método que calcula e retorna a Matriz kpu
+	 * 
+	 * @return kpu martiz kpu
+	 */
+	public Matriz get_kpu() {
+		Matriz kpu = new Matriz(this.get_n_Reacoes(), this.get_n_DOF());
+
+		Iterator<Barra> itListaBarra = modelo.get_listaBarra().iterator();
+		while (itListaBarra.hasNext()) {
+			Barra bar_aux = itListaBarra.next();
+
+			Matriz k_global = Barra.k_global(bar_aux);
+
+			int[] equacao = new int[2 * modelo.get_n_DOF()];
+			int[] aux1 = new int[modelo.get_n_DOF()];
+			int[] aux2 = new int[modelo.get_n_DOF()];
+			aux1 = modelo.getBarra(bar_aux.get_id()).get_no_inicial().get_equacoes();
+			aux2 = modelo.getBarra(bar_aux.get_id()).get_no_final().get_equacoes();
+
+			for (int i = 0; i < modelo.get_n_DOF(); i++) {
+				equacao[i] = aux1[i];
+			}
+
+			for (int i = modelo.get_n_DOF(); i < equacao.length; i++) {
+				equacao[i] = aux2[i - modelo.get_n_DOF()];
+			}
+
+			int n_DOF_barra = 0;
+
+			for (int i = 0; i < equacao.length; i++) {
+				if (equacao[i] > 0)
+					n_DOF_barra = n_DOF_barra + 1;
+			}
+
+			int n_restricao_barra = (2 * modelo.get_n_DOF()) - n_DOF_barra;
+			int[] pos_k_global_linha = new int[n_restricao_barra];
+			int[] pos_k_global_coluna = new int[n_DOF_barra];
+			int[] pos_kpu_linha = new int[n_restricao_barra];
+			int[] pos_kpu_coluna = new int[n_DOF_barra];
+			int k = 0;// contador
+			int m = 0;// contador
+
+			for (int i = 0; i < equacao.length; i++) { // ver exemplo treliça caderno para entender
+				if (equacao[i] < 0) { // kpu pega termos com indices negativos na linha e positivo na coluna
+					pos_k_global_linha[k] = i; // ver slide aula 16 na página 7
+					pos_kpu_linha[k] = ((-1) * equacao[i]) - 1;
+					k++;
+				} else {
+					pos_k_global_coluna[m] = i;
+					pos_kpu_coluna[m] = equacao[i] - 1;
+					m++;
+				}
+			}
+
+			for (int q = 0; q < pos_kpu_linha.length; q++) {// vai ser sempre retangular
+				for (int p = 0; p < pos_kpu_coluna.length; p++) {
+					kpu.setMatriz(pos_kpu_linha[q], pos_kpu_coluna[p],
+							kpu.getMatriz(pos_kpu_linha[q], pos_kpu_coluna[p])
+									+ k_global.getMatriz(pos_k_global_linha[q], pos_k_global_coluna[p]));
+				}
+			}
+		}
+		return kpu;
+	}
+
+	/**
+	 * Método que calcula e retorna a Matriz kup
+	 * 
+	 * @return kup matriz kup
+	 */
+	public Matriz get_kup() {
+		Matriz kup = new Matriz(this.get_n_DOF(), this.get_n_Reacoes());
+
+		Iterator<Barra> itListaBarra = modelo.get_listaBarra().iterator();
+		while (itListaBarra.hasNext()) {
+			Barra bar_aux = itListaBarra.next();
+
+			Matriz k_global = Barra.k_global(bar_aux);
+
+			int[] equacao = new int[2 * modelo.get_n_DOF()];
+			int[] aux1 = new int[modelo.get_n_DOF()];
+			int[] aux2 = new int[modelo.get_n_DOF()];
+			aux1 = modelo.getBarra(bar_aux.get_id()).get_no_inicial().get_equacoes();
+			aux2 = modelo.getBarra(bar_aux.get_id()).get_no_final().get_equacoes();
+
+			for (int i = 0; i < modelo.get_n_DOF(); i++) {
+				equacao[i] = aux1[i];
+			}
+
+			for (int i = modelo.get_n_DOF(); i < equacao.length; i++) {
+				equacao[i] = aux2[i - modelo.get_n_DOF()];
+			}
+
+			int n_DOF_barra = 0;
+
+			for (int i = 0; i < equacao.length; i++) {
+				if (equacao[i] > 0)
+					n_DOF_barra = n_DOF_barra + 1;
+			}
+
+			int n_restricao_barra = (2 * modelo.get_n_DOF()) - n_DOF_barra;
+			int[] pos_k_global_linha = new int[n_DOF_barra];
+			int[] pos_k_global_coluna = new int[n_restricao_barra];
+			int[] pos_kup_linha = new int[n_DOF_barra];
+			int[] pos_kup_coluna = new int[n_restricao_barra];
+			int k = 0;
+			int m = 0;
+
+			for (int i = 0; i < equacao.length; i++) {// aqui é linha positiva e coluna negativa
+				if (equacao[i] > 0) { // contrário da kpu
+					pos_k_global_linha[k] = i;
+					pos_kup_linha[k] = equacao[i] - 1;
+					k++;
+				} else {
+					pos_k_global_coluna[m] = i;
+					pos_kup_coluna[m] = ((-1) * equacao[i]) - 1;
+					m++;
+				}
+			}
+
+			for (int q = 0; q < pos_kup_linha.length; q++) {
+				for (int p = 0; p < pos_kup_coluna.length; p++) {
+					kup.setMatriz(pos_kup_linha[q], pos_kup_coluna[p],
+							kup.getMatriz(pos_kup_linha[q], pos_kup_coluna[p])
+									+ k_global.getMatriz(pos_k_global_linha[q], pos_k_global_coluna[p]));
+				}
+			}
+		}
+		return kup;
+	}
+
+	/**
+	 * Método que calcula e retorna a Matriz kpp
+	 * 
+	 * @return kpp matriz kpp
+	 */
+	public Matriz get_kpp() {
+		Matriz kpp = new Matriz(this.get_n_Reacoes(), this.get_n_Reacoes());
+
+		Iterator<Barra> itListaBarra = modelo.get_listaBarra().iterator();
+		while (itListaBarra.hasNext()) {
+			Barra bar_aux = itListaBarra.next();
+
+			Matriz k_global = Barra.k_global(bar_aux);
+
+			int[] equacao = new int[2 * modelo.get_n_DOF()];
+			int[] aux1 = new int[modelo.get_n_DOF()];
+			int[] aux2 = new int[modelo.get_n_DOF()];
+			aux1 = modelo.getBarra(bar_aux.get_id()).get_no_inicial().get_equacoes();
+			aux2 = modelo.getBarra(bar_aux.get_id()).get_no_final().get_equacoes();
+
+			for (int i = 0; i < modelo.get_n_DOF(); i++) {
+				equacao[i] = aux1[i];
+			}
+
+			for (int i = modelo.get_n_DOF(); i < equacao.length; i++) {
+				equacao[i] = aux2[i - modelo.get_n_DOF()];
+			}
+
+			int n_DOF_barra = 0;
+
+			for (int i = 0; i < equacao.length; i++) {
+				if (equacao[i] > 0)
+					n_DOF_barra = n_DOF_barra + 1;
+			}
+
+			int n_restricao_barra = (2 * modelo.get_n_DOF()) - n_DOF_barra;
+			int[] pos_k_global = new int[n_restricao_barra];
+			int[] pos_kpp = new int[n_restricao_barra];
+			int k = 0;
+
+			for (int i = 0; i < equacao.length; i++) {// aqui é só termos de equação negativa
+				if (equacao[i] < 0) {
+					pos_k_global[k] = i;
+					pos_kpp[k] = ((-1) * equacao[i]) - 1;
+					k++;
+				}
+			}
+
+			for (int q = 0; q < pos_kpp.length; q++) {
+				for (int p = 0; p < pos_kpp.length; p++) {
+					kpp.setMatriz(pos_kpp[q], pos_kpp[p], kpp.getMatriz(pos_kpp[q], pos_kpp[p])
+							+ k_global.getMatriz(pos_k_global[q], pos_k_global[p]));
+				}
+			}
+		}
+		return kpp;
+	}
+
+	/**
+	 * Método que monta e retorna a matriz de rigidez completa da estrutura
+	 * 
+	 * @return k_total matriz de rigidez total da esrtutura
+	 */
+	public Matriz get_k_total() {
+		int m = (modelo.get_numeroDeNodes()) * (modelo.get_n_DOF());// número total de graus de liberdade do modelo
+		Matriz k_total = new Matriz(m, m); // independente se tá restrito ou não
+
+		for (int i = 0; i < this.get_kuu().getN_Linhas(); i++) {// preenchimento da parcela kuu (superior esquerda)
+			for (int j = 0; j < this.get_kuu().getN_Colunas(); j++) {
+				k_total.setMatriz(i, j, this.get_kuu().getMatriz(i, j));
+			}
+		}
+
+		for (int i = 0; i < this.get_kup().getN_Linhas(); i++) {// preenchimento da parcela kup (superior direita)
+			for (int j = (this.get_kuu().getN_Colunas()); j < k_total.getN_Colunas(); j++) {
+				k_total.setMatriz(i, j, this.get_kup().getMatriz(i, j - this.n_DOF));
+			}
+		}
+
+		for (int i = this.get_kuu().getN_Linhas(); i < k_total.getN_Linhas(); i++) {// preenchimento da parcela kpu
+																					// (inferior esquerda)
+			for (int j = 0; j < this.get_kpu().getN_Colunas(); j++) {
+				k_total.setMatriz(i, j, this.get_kpu().getMatriz(i - this.n_DOF, j));
+			}
+		}
+
+		for (int i = this.get_kuu().getN_Linhas(); i < k_total.getN_Linhas(); i++) {// preenchimento da parcela kpp
+																					// (inferior direita)
+			for (int j = this.get_kpu().getN_Colunas(); j < k_total.getN_Colunas(); j++) {
+				k_total.setMatriz(i, j, this.get_kpp().getMatriz(i - this.n_DOF, j - this.n_DOF));
+			}
+		}
+		return k_total;
+	}
+
+	/**
+	 * Método que retorna o vetor de cargas nodais reduzido (fn+feq) (prescritas)
+	 * 
+	 * @return fp vetor de cargas nodais reduzido (prescritas)
+	 */
+	public Vetor get_Fp() {
+		// força nodal - fn - sistema global
+		Vetor fn = new Vetor(this.get_n_DOF());
+		Iterator<Node> itListaNode = modelo.get_listaNode().iterator();
+
+		while (itListaNode.hasNext()) { // pega as forças nodais vindas com o arquivo txt e já lidas e armazenadas
+			Node node_aux = itListaNode.next();
+			for (int j = 0; j < modelo.get_n_DOF(); j++) {
+				if (modelo.getNode(node_aux.get_id()).get_equacao(j) > 0) {
+					fn.setVetor(modelo.getNode(node_aux.get_id()).get_equacao(j) - 1,
+							modelo.getNode(node_aux.get_id()).get_forca(j));
+				}
+			}
+		}
+
+		// força nodal equivalente - feq - sistema global
+		Vetor feq = new Vetor(this.get_n_DOF());
+		Vetor feq_aux = new Vetor(this.get_n_DOF());// tamanho dos total de graus livres do modelo
+
+		Iterator<Barra> itListaBarra1 = modelo.get_listaBarra().iterator();
+		while (itListaBarra1.hasNext()) {// pega as forças equivalentes globais com sentido correto (oposto) de cada no
+											// de cada barra
+			Barra bar_aux = itListaBarra1.next();
+			for (int m = 0; m < modelo.get_n_DOF(); m++) {
+				if (modelo.getBarra(bar_aux.get_id()).get_no_inicial().get_equacao(m) > 0) {// Só tem feq pra somar em
+																							// fp se não for restrito -
+																							// no incial
+					int pos = modelo.getBarra(bar_aux.get_id()).get_no_inicial().get_equacao(m) - 1;
+					double valor = modelo.getBarra(bar_aux.get_id()).getEquivalentLoadGlobal().getVetor(m);
+					feq_aux.setVetor(pos, valor);
+					feq.addVetor(feq_aux);
+					feq_aux.setVetor(pos, 0);
+				}
+			}
+
+			for (int q = 0; q < modelo.get_n_DOF(); q++) {
+				if (modelo.getBarra(bar_aux.get_id()).get_no_final().get_equacao(q) > 0) { // no final
+					int pos = modelo.getBarra(bar_aux.get_id()).get_no_final().get_equacao(q) - 1;
+					double valor = modelo.getBarra(bar_aux.get_id()).getEquivalentLoadGlobal()
+							.getVetor(q + modelo.get_n_DOF());
+					feq_aux.setVetor(pos, valor);
+					feq.addVetor(feq_aux);
+					feq_aux.setVetor(pos, 0);
+				}
+			}
+		}
+
+		// força nodal prescrita
+		Vetor fp = new Vetor(this.get_n_DOF());
+		fp.addVetor(feq, fn);
+		return fp;
+	}
+
+	/**
+	 * Método que retorna o vetor de deslocamentos prescritos
+	 * 
+	 * @return dp vetor de deslocamentos prescritos
+	 */
+	public Vetor get_Dp() { // pega os deslocamentos já informados nos nós com alguma restrição, valores
+							// foram dados no txt
+		Vetor dp = new Vetor(this.get_n_Reacoes());
+		int n = 0;
+		Iterator<Node> itListaNode = modelo.get_listaNode().iterator();
+		while (itListaNode.hasNext()) {
+			Node node_aux = itListaNode.next();
+			for (int j = 0; j < modelo.get_n_DOF(); j++) {
+				if (modelo.getNode(node_aux.get_id()).get_equacao(j) < 0) {
+					dp.setVetor(n, modelo.getNode(node_aux.get_id()).get_deslocamento(j));
+					n++;
+				}
+			}
+		}
+		return dp;
+	}
+
+}

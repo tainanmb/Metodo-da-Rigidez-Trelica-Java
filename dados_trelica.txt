@@ -1,0 +1,97 @@
+COMPUTATION APPLIED DO ENGINEERING - TRUSS
+
+%BEGIN_INITIAL_DATA
+Type
+Truss	
+%END_INITIAL_DATA
+
+%BEGIN_NODES
+Nodes		cx		cy		cz
+N1  		0.0		0.0		0.0
+N2		2.0		0.0		0.0
+N3		4.0		0.0		0.0
+N4		6.0		0.0		0.0
+N5		8.0		0.0		0.0
+N6		2.0		2.0		0.0
+N7		4.0		2.0		0.0
+N8		6.0		2.0		0.0
+%END_NODES
+
+%BEGIN_MATERIALS
+Material  		E   		nu
+M1			210.0E6	0.3
+M2			200.0E6	0.25
+%END_MATERIALS
+
+%BEGIN_SECTIONS
+Section		Tipo			A/LA/R	I/LB
+S1			Prescribed		6.0E-3	7.2E-6
+S2			Rectangular	0.06		0.15
+%END_SECTIONS
+
+%BEGIN_BARS
+Barra		Node_i	Node_f	Material	Section	
+B12		N1		N2		M1		S1	
+B23		N2		N3		M1		S1	
+B34		N3		N4		M1		S1	
+B45		N4		N5		M1		S1	
+B67		N6		N7		M1		S1	
+B78		N7		N8		M1		S1	
+B16		N1		N6		M2		S2	
+B26		N2		N6		M2		S2	
+B27		N2		N7		M2		S2	
+B37		N3		N7		M2		S2	
+B47		N4		N7		M2		S2	
+B48		N4		N8		M2		S2	
+B58		N5		N8		M2		S2
+%END_BARS
+
+%BEGIN_NODAL_FORCES
+Node	Fx		Fy
+N1	0.0		0.0
+N2	0.0		-100.0
+N3	0.0		-100.0
+N4	0.0		-100.0
+N5	0.0		0.0
+N6	0.0		0.0
+N7	0.0		0.0
+N8	0.0		0.0
+%END_NODAL_FORCES
+
+%BEGIN_POINT_LOADS
+Load	Bar	Position	Fx		Fy		M
+%END_POINT_LOADS
+
+%BEGIN_DISTRIBUTED_LOADS
+Load	Bar	Initial	Final		q_initial	q_final
+%END_DISTRIBUTED_LOADS
+
+%BEGIN_RESTRAINTS
+Node	Ux		Uy
+N1	true		true
+N2	false		false
+N3	false		false
+N4	false	 	false
+N5	true	 	true
+N6	false	 	false
+N7	false	 	false
+N8	false	 	false
+%END_RESTRAINTS
+
+%BEGIN_DISPLACEMENTS
+Node	Ux		Uy
+N1	0.0		0.0
+N2	0.0		0.0
+N3	0.0		0.0
+N4	0.0		0.0
+N5	0.0		-0.002
+N6	0.0		0.0
+N7	0.0		0.0
+N8	0.0		0.0
+%END_DISPLACEMENTS
+
+
+
+
+
+

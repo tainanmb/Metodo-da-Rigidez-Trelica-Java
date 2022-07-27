@@ -1,0 +1,498 @@
+package modelo;
+import algebraLinear.*;
+import structureLoad.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+/** 
+ * Superclasse abstrata que descreve uma barra utilizada em 
+ * um modelo estrutural reticulado espacial, do tipo viga, treliça ou pórtico.
+ * <p>
+ * Dados:
+ * <ul>
+ * <li> id - Identificador da Barra
+ * <li> no_inicial - Nó Inicial da Barra
+ * <li> no_final - Nó Final da Barra
+ * <li> mat_bar - Material da Barra
+ * <li> sec_bar - Seção Transversal da Barra
+ * <li> q_load_list - Lista de carregamento distribuído na barra
+ * <li> p_load_list - Lista de carregamento pontual na barra
+ * </ul>
+ * @author Tainan Brandão
+ * @version 1.0
+ */
+
+public abstract class Barra implements EquivalentLoad {              
+	                                                   
+	/**
+	 * Declaração dos campos da classe.
+	 */  	
+    private String id;
+	private Node no_inicial;	
+	private Node no_final;	
+	private Material mat_bar;	
+	private SecaoTransversal sec_bar;
+	private ArrayList<DistributedLoad> q_load_list;
+	private ArrayList<PointLoad> p_load_list;
+	
+	/**
+	 * Construtor sem parâmetro 
+	 */    		
+	public Barra () {
+		this.id = null ;
+		this.no_inicial = new Node ();
+		this.no_final = new Node ();
+		this.mat_bar = new Material ();
+		this.sec_bar =  null;
+		this.q_load_list=null;
+		this.p_load_list=null;
+	}	
+
+	/**
+	 * Construtor que recebe como argumento o identificador (id), nó inicial (no_inicial), nó final (no_final), material (mat_bar) e seção transversal (sec_bar) e preenche todos os campos da barra.
+	 * @param id identificador da barra
+	 * @param no_inicial nó inicial da barra
+	 * @param no_final nó final da barra
+	 * @param mat_bar material da barra
+	 * @param sec_bar I seção transversal da barra
+	 */	
+    public Barra (String id, Node no_inicial, Node no_final, Material mat_bar, SecaoTransversal sec_bar) {
+		this.id=id;
+		this.no_inicial=no_inicial;
+		this.no_final=no_final;
+		this.mat_bar=mat_bar;
+		this.sec_bar=sec_bar;
+		this.p_load_list= new ArrayList<PointLoad>();
+		this.q_load_list= new ArrayList<DistributedLoad>();
+			
+	}
+    
+	/**
+	 * Método que recebe os parâmetros como argumento e inicializa a barra. 
+	 * @param id identificador da barra
+	 * @param no_inicial nó inicial da barra
+	 * @param no_final nó final da barra
+	 * @param mat_bar material da barra
+	 * @param sec_bar I seção transversal da barra
+	 */		
+    public void initBarra (String id, Node no_inicial, Node no_final, Material mat_bar, SecaoTransversal sec_bar) {
+		this.id=id;
+		this.no_inicial=no_inicial;
+		this.no_final=no_final;
+		this.mat_bar=mat_bar;
+		this.sec_bar=sec_bar;
+		this.p_load_list= new ArrayList<PointLoad>();
+		this.q_load_list= new ArrayList<DistributedLoad>();
+			
+	}
+    
+    /**
+     * Método estático padrão factory que instancia os tipos das barras.
+     * @param tipo tipo da barra
+     * @return barfac barra instanciada com construtor sem argumento
+     */
+    public static Barra factory(String tipo) {
+    	Barra barfac;    	
+    	switch(tipo)
+    	{
+    	case("Truss"):
+    		barfac = new Trelica();
+    	break;
+    	default:
+    		System.out.println("Tipo de barra não previsto.");
+    		barfac = null;
+    		System.exit(1);
+    	}
+    	return barfac;
+    }
+    
+    /**Método abstrato para cálculo da rigidez local de um barra.
+     * @return k_local matriz de rigidez local
+     */
+    public abstract Matriz k_local();
+      
+    /**Método abstrato para transformação das coordenadas locais de um barra em globais.
+     * @return transf matriz de transformação das coordenadas 
+     */    
+    public abstract Matriz transf();
+    
+    /**
+     * Método estático para cálculo do comprimento da barra
+     * @param no_inicial Nó inicial da barra
+     * @param no_final Nó final da barra
+     * @return calcL Comprimento da barra 
+     */
+    public static double calcL (Node no_inicial , Node no_final) {
+       	double deltax = no_final.get_cx()-no_inicial.get_cx();
+       	double deltay = no_final.get_cy()-no_inicial.get_cy();
+    	double calcL = Math.pow(deltax, 2) + Math.pow(deltay, 2);
+    	calcL = Math.sqrt(calcL);    	
+		return calcL;
+    }
+    
+    /**
+     * Método estático para cálculo da variação do comprimento entre dois nós na direção x.
+     * @param no_inicial Nó inicial da barra
+     * @param no_final Nó final da barra
+     * @return deltax variação do comprimento na direção x 
+     */
+    public static double delta_x (Node no_inicial , Node no_final) {
+       	double deltax = no_final.get_cx()-no_inicial.get_cx();       	
+		return deltax;
+    }
+    
+    /**
+     * Método estático para cálculo da variação do comprimento entre dois nós na direção y.
+     * @param no_inicial Nó inicial da barra
+     * @param no_final Nó final da barra
+     * @return deltay variação do comprimento na direção y  
+     */
+    public static double delta_y (Node no_inicial , Node no_final) {
+       	double deltay = no_final.get_cy()-no_inicial.get_cy();       	
+		return deltay;
+    }
+
+    /**
+     * Método estático para cálculo da martiz global de uma barra.
+     * @param barra barra que terá sua matriz de rigidez calculada
+     * @return k_global matriz de rigidez global da barra
+     */
+    public static Matriz k_global (Barra barra) {
+    	Matriz k_global = new Matriz ();
+    	Matriz transf = barra.transf();
+    	Matriz k_local = barra.k_local();
+    	k_global = Matriz.transposta(transf);
+    	k_global = k_global.mulMatriz(k_local);
+    	k_global = k_global.mulMatriz(transf);
+    	return k_global;
+    }    
+  	
+    /**
+     * Método para adicionar cargas pontuais no ArrayList.
+     * @param PLoad carga pontual a ser adicionada na barra
+     */
+    public void addPointLoad(PointLoad PLoad) {
+		p_load_list.add(PLoad);//Adicionar objetos do tipo PointLoad a lista de pLoad
+	}
+
+    /**
+     * Método para adicionar cargas pontuais no ArrayList.
+     * @param qLoad carga distribuida a ser adicionada na barra
+     */
+    public void addDistributeLoad(DistributedLoad qLoad) {
+		q_load_list.add(qLoad);
+	}
+        
+	/**
+	 * Método de acesso Get que retorna o identificador da barra (id)
+	 * @return identificador da barra 
+	 */				
+	public String get_id () {
+		return id;
+	}
+		
+	/**
+	 * Método de acesso Get que retorna nó inicial da barra (no_inicial)
+	 * @return nó inicial da barra
+	 */				
+	public Node get_no_inicial () {
+		return no_inicial;
+	}
+		
+	/**
+	 * Método de acesso Get que retorna o nó final da barra (no_final)
+	 * @return nó final da barra
+	 */				
+	public Node get_no_final () {
+		return no_final;
+	}
+		
+	/**
+	 * Método de acesso Get que retorna o material da barra (mat_bar)
+	 * @return material da barra
+	 */		
+	public Material get_mat_bar () {
+		return mat_bar;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a seção transversal da barra (sec_bar)
+	 * @return seção transversal da barra
+	 */		
+	public SecaoTransversal get_sec_bar () {
+		return sec_bar;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a lista de carregamentos distribuidos da barra (q_load_list)
+	 * @return lista de carregamento distribuido
+	 */	
+	public ArrayList<DistributedLoad> get_q_load_list() {
+		return this.q_load_list;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a lista de carregamentos pontuais da barra (p_load_list)
+	 * @return lista de carregamento pontual
+	 */	
+	public ArrayList<PointLoad> get_p_load_list() {
+		return this.p_load_list;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna um carregamento específico da lista de carregamentos distribuidos da barra (q_load_list[i])
+	 * @param i posição específica
+	 * @return q_load_list [i] Carregamento distribuído na posição [i]
+	 */	
+	public DistributedLoad get_q_load(int i) {
+		if ((i>=0)&&(i<this.get_Numero_DistributedLoads()))
+			return this.q_load_list.get(i);
+		else {
+		System.out.println ("Método get incorreto: Tentativa de acesso em posição inexistente da q_load_list");
+		System.exit(1);
+		return null;
+	    }
+	}	
+	
+	/**
+	 * Método de acesso Get que retorna um carregamento específico da lista de carregamentos 
+	 * distribuidos da barra através do id
+	 * @param id identificação da carga
+	 * @return q_load_aux Carregamento distribuído 
+	 */	
+	public DistributedLoad get_q_load(String id) {
+     Iterator<DistributedLoad> itListaQLoad = this.q_load_list.iterator();
+		while (itListaQLoad.hasNext()) {			
+			DistributedLoad q_load_aux = itListaQLoad.next();
+			if (q_load_aux.get_id() != null) {
+				if (q_load_aux.get_id().equals(id)) {
+					return q_load_aux;				
+				}
+			}
+		}
+		return null;
+	}
+		
+	/**
+	 * Método de acesso Get que retorna um carregamento específico da lista de carregamentos 
+	 * pontuais da barra através do id
+	 * @param i posição específica
+	 * @return p_load_aux Carregamento concentrado 
+	 */		
+	public PointLoad get_p_load(int i) {	
+		if ((i>=0)&&(i<this.get_Numero_PointLoads())) {
+			return this.p_load_list.get(i);
+		} else {
+		System.out.println ("Método get incorreto: Tentativa de acesso em posição inexistente da p_load_list");
+		System.exit(1);
+		return null;
+	    }
+	}	
+	
+	/**
+	 * Método de acesso Get que retorna um carregamento específico da lista de carregamentos distribuidos da barra através do id
+	 * @param id identificação da carga
+	 * @return q_load_list  Carregamento distribuído
+	 */	
+	public PointLoad get_p_load(String id) {
+     Iterator<PointLoad> itListaPLoad = this.p_load_list.iterator();
+		
+		while (itListaPLoad.hasNext()) {			
+			PointLoad p_load_aux = itListaPLoad.next();
+			if (p_load_aux.get_id() != null) {
+				if (p_load_aux.get_id().equals(id)) {
+					return p_load_aux;				
+				}
+			}
+		}		
+		return null;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna o número de carregamentos pontuais da barra 
+	 * @return n número de carregamentos pontuais da barra
+	 */	
+	public int get_Numero_PointLoads() {
+		 int n= this.p_load_list.size();
+		 return n;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna o número de carregamentos distribuidos da barra 
+	 * @return n número de carregamentos distribuidos da barra
+	 */	
+	public int get_Numero_DistributedLoads() {
+		 int n=this.q_load_list.size();
+		 return n;
+	}
+
+	/**
+	 * Método abstrato de acesso Get que retorna um vetor com os deslocamentos da barra
+	 * @return Deslocamento vetor com os deslocamentos da barra
+	 */	
+	abstract public Vetor get_deslocamentos ();
+    
+	/**
+	 * Método abstrato de acesso Get que retorna um vetor com as forças de extremidade da barra
+	 * @return endForce forças de extremidade da barra
+	 */		
+	public Vetor getEndForces() {
+		Vetor endForce = null;
+		Vetor feq = this.getEquivalentLoadLocal();
+		feq.scale(-1);		
+		Matriz kLocal = this.k_local();		
+		Vetor dLocal = this.transf().mulVetor(this.get_deslocamentos());		
+		endForce = kLocal.mulVetor(dLocal);
+		endForce.addVetor(feq);		
+		return endForce;
+	}
+	
+	/**
+	 * Método modificador Set do identificador da barra (id) (sem retorno)
+	 * @param id identificador da barra
+	 */    		
+	public void set_id (String id) {
+		this.id = id;
+	}
+	
+	/**
+	 * Método modificador Set do nó inicial da barra (no_inicial) (sem retorno)
+	 * @param no_inicial nó inicial da barra
+	 */   		
+	public void set_no_inicial (Node no_inicial) {
+		this.no_inicial = no_inicial;
+	}
+		
+	/**
+	 * Método modificador Set do nó final da barra (no_final) (sem retorno)
+	 * @param no_final nó final da barra
+	 */   
+	public void set_no_final (Node no_final) {
+		this.no_final = no_final;
+	}
+		
+	/**
+	 * Método modificador Set do material da barra (mat_bar) (sem retorno)
+	 * @param mat_bar material da barra
+	 */   
+	public void set_mat_bar (Material mat_bar) {
+		this.mat_bar = mat_bar;
+	}
+		
+	/**
+	 * Método modificador Set da seção transversal da barra (sec_bar) (sem retorno)
+	 * @param sec_bar seção transversal da barra
+	 */   
+	public void set_sec_bar (SecaoTransversal sec_bar) {
+		this.sec_bar = sec_bar;
+	}
+	
+	/**
+	 * Método modificador Set da lista de carregamento distribuido da barra (q_load_list) (sem retorno)
+	 * @param q_load_list lista de carregamento distribuido
+	 */   
+	public void set_q_load_list (ArrayList<DistributedLoad> q_load_list) {
+		this.q_load_list=q_load_list;
+	}
+	
+	/**
+	 * Método modificador Set da lista de carregamento pontual da barra (p_load_list) (sem retorno)
+	 * @param p_load_list lista de carregamento distribuido
+	 */   
+	public void set_p_load_list (ArrayList<PointLoad> p_load_list) {
+		this.p_load_list=p_load_list;
+	}
+	
+	/**
+	 * Método modificador Set de um carregamento distribuido específico da barra (q_load_list[i]) (sem retorno)
+	 * @param i posição específica i
+	 * @param q_load carregamento distribuido
+	 */   
+	public void set_q_load (int i, DistributedLoad q_load) {
+		if ((i>=0)&&(i<this.get_Numero_DistributedLoads()))
+			this.q_load_list.set(i, q_load);			
+			else {
+				System.out.println ("Método set incorreto: Tentativa de modificação de posição inexistente da q_load_list");
+				System.exit(1);
+			}		
+	}	
+	
+	/**
+	 * Método modificador Set de um carregamento distribuido específico da barra  (sem retorno)
+	 * @param id id do nó que será "setado"
+	 * @param q_load carregamento distribuído
+	 */   
+	public void set_q_load (String id, DistributedLoad q_load) {
+    Iterator<DistributedLoad> itListaQLoad = this.q_load_list.iterator();
+	    if (q_load_list.contains(this.get_q_load(id))==false) {
+	    	System.out.println("Método set incorreto: O carregamento distribuído de id procurado não foi encontrado");
+	    	System.exit(1);	
+	    }
+		while (itListaQLoad.hasNext()) {			
+			DistributedLoad q_load_aux = itListaQLoad.next();
+			if (q_load_aux.get_id().equals(id)) {				
+				this.q_load_list.set(this.q_load_list.indexOf(q_load_aux), q_load);				
+			}
+		}		
+	}
+	
+	/**
+	 * Método modificador Set de um carregamento pontual específico da barra (p_load_list[i]) (sem retorno)
+	 * @param i posição específica i
+	 * @param p_load carregamento pontual
+	 */   
+	public void set_p_load (int i, PointLoad p_load) {
+		if ((i>=0)&&(i<this.get_Numero_PointLoads()))
+			this.p_load_list.set(i, p_load);
+			
+			else {
+				System.out.println ("Método set incorreto: Tentativa de modificação de posição inexistente p_load_list");
+				System.exit(1);
+			}
+		
+	}	
+
+	/**
+	 * Método modificador Set de um carregamento distribuido específico da barra  (sem retorno)
+	 * @param id id do nó que será "setado"
+	 * @param p_load carregamento distribuído
+	 */   
+	public void set_p_load (String id, PointLoad p_load) {
+    Iterator<PointLoad> itListaPLoad = this.p_load_list.iterator();	    
+    if (p_load_list.contains(this.get_p_load(id))==false) {
+    	System.out.println("Método set incorreto: A carga pontual de id procurada não foi encontrada");
+    	System.exit(1);	
+    }
+		while (itListaPLoad.hasNext()) {				
+			PointLoad p_load_aux = itListaPLoad.next();
+			if (p_load_aux.get_id().equals(id)) {					
+				this.p_load_list.set(this.p_load_list.indexOf(p_load_aux), p_load);					
+			}
+		}						
+	}						
+		
+	/**
+	 * Método que retorna um texto contendo os dados da barra: identificador (id), 
+	 * nó inicial (no_inicial), nó final (no_final), 
+	 * material (mat_bar) e seção transversal (sec_bar)
+	 * @return Texto contendo os dados da barra
+	 */				
+	public String toString () {
+    	String texto;
+    	texto = "\n ******************Barra " +id +"******************";    	
+    	texto += "\n Nó inicial" + " " +no_inicial+"\n";
+    	texto += "\n Nó final" +" " +no_final+"\n";
+    	texto += "\n Material" +" " +mat_bar+"\n";
+    	texto += "\n Seção" +" " +sec_bar+"\n";
+    	Iterator <PointLoad> itPLoad = this.p_load_list.iterator();
+    	while (itPLoad.hasNext()) {
+    		texto += itPLoad.next() + " ";
+    	}
+    	Iterator <DistributedLoad> itQLoad = this.q_load_list.iterator();
+    	while (itQLoad.hasNext()) {
+    		texto += itQLoad.next() + " ";
+    	}
+    	return texto;
+    }
+	
+}

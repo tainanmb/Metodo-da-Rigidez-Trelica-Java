@@ -1,0 +1,152 @@
+package structureLoad;
+
+/** 
+ * Classe que descreve um carregamento distribuído em uma barra.
+ * <p>
+ * Dados:
+ * <ul>
+ * <li> id - Identificador  
+ * <li> pos_i - Posição do carregamento em relação ao nó inicial
+ * <li> pos_f - Posição do carregamento em relação ao nó final
+ * <li> qi - Intensidade inicial do carregamento distribuído
+ * <li> qf - Intensidade final do carregamento distribuído
+ * </ul>
+ * @author Ana Paula Moura, Eduarda Marques, Tainan Brandão
+ * @version 1.0
+ */
+
+public class DistributedLoad {
+	
+	/**
+	 * Declaração dos campos da classe.
+	 */  
+	private String id;
+	private double pos_i;
+	private double pos_f;
+	private double qi;
+	private double qf;
+	
+	/**
+	 * Construtor sem parâmetro.
+	 */		
+	public DistributedLoad () {
+		this.id= null;
+		this.pos_i=0;
+		this.pos_f=0;
+		this.qi=0;
+		this.qf=0;
+	}
+	
+	/**
+	 * Construtor que recebe argumentos e preenche todos os campos da carga distribuída.	
+	 *@param id - Identificador  
+	 *@param pos_i posição do carregamento em relação ao nó inicial
+	 *@param pos_f posição do carregamento em relação ao nó final
+	 *@param qi intensidade inicial do carregamento distribuído
+	 *@param qf intensidade inicial do carregamento distribuído
+	 */	
+	public DistributedLoad (String id, double pos_i, double pos_f, double qi, double qf) {
+		this.id= id;
+		this.pos_i=pos_i;
+		this.pos_f=pos_f;
+		this.qi=qi;
+		this.qf=qf;	
+	}
+	
+	/**
+	 * Método de acesso Get que retorna o identificador.
+	 * @return Identificador 
+	 */	
+	public String get_id() {
+		return this.id;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a posição inicial do carregamento em relação ao nó inicial.
+	 * @return Posição inicial do carregamento em relação ao nó inicial 
+	 */	
+	public double get_InicialPosition() {
+		return this.pos_i;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a posição final do carregamento em relação ao nó inicial.
+	 * @return Posição final do carregamento em relação ao nó inicial 
+	 */	
+	public double get_FinalPosition() {
+		return this.pos_f;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a intensidade inicial do carregamento distribuído.
+	 * @return Intensidade inicial do carregamento distribuído
+	 */	
+	public double get_InicalLoad() {
+		return this.qi;
+	}
+	
+	/**
+	 * Método de acesso Get que retorna a intensidade final do carregamento distribuído.
+	 * @return Intensidade final do carregamento distribuído
+	 */	
+	public double get_FinalLoad() {
+		return this.qf;
+	}
+	
+	/**
+	 * Método modificador Set do identificador (sem retorno).
+	 * @param id identificador 
+	 */
+	public void set_id(String id) {
+		this.id=id;
+	}
+	
+	/**
+	 * Método modificador Set da posição inicial da carga (sem retorno).
+	 * @param inicialPosition posição inicial da carga 
+	 */	
+	public void set_InicialPosition(double inicialPosition) {
+		this.pos_i=inicialPosition;
+	}
+	
+	/**
+	 * Método modificador Set da posição inicial da carga (sem retorno).
+	 * @param finalPosition posição inicial da carga 
+	 */	
+	public void set_FinalPosition(double finalPosition) {
+		this.pos_f=finalPosition;
+	}
+	
+	/**
+	 * Método modificador Set intensidade inicial do carregamento distribuído (sem retorno).
+	 * @param inicialLoad intensidade inicial do carregamento distribuído
+	 */	
+	public void set_InicialLoad(double inicialLoad) {
+		this.qi=inicialLoad;
+	}
+	
+	/**
+	 * Método modificador Set intensidade final do carregamento distribuído (sem retorno).
+	 * @param finalLoad intensidade final do carregamento distribuído
+	 */	
+	public void set_FinalLoad(double finalLoad) {
+		this.qf=finalLoad;
+	}
+	
+	/**
+	 * Método que retorna um texto contendo os dados da carga pontual: identificador (id),
+	 * posição inicial e do carregamento (pos_i e pos_f),
+	 * intensidade inicial e final do carregamento (qi e qf)
+	 * intensidade das forças na direção do eixo x e y
+	 * (fx e fy) e intensidade do momento fletor em torno do eizo z (m).
+	 * @return Texto contendo os dados da carga pontual
+	 */		
+	public String toString () {
+    	String texto;
+    	texto = "\n ";
+    	texto +=  id;
+    	texto +=  "\n Posição inicial-Posição final: (" + pos_i + " , " + pos_f + ")";
+    	texto +=  "\n Carga inicial-Carga final: (" + qi + " , " + qf + ")";
+    	return texto;
+	}	
+}

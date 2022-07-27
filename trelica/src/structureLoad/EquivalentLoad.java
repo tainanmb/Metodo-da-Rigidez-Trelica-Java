@@ -1,0 +1,35 @@
+package structureLoad;
+
+import algebraLinear.Vetor;
+
+/**
+ * Interface que caracteriza o carregamento equivalente de uma barra. descreve
+ * os métodos necessários em classes cuja interface é implementada.
+ * 
+ * @author Tainan Brandão
+ * @version 1.0
+ */
+
+public interface EquivalentLoad {
+
+	/**
+	 * Método abstrato de acesso Get que retorna as forças equivalentes nos nós
+	 * iniciais e finais, oriundas do somatório de cargas pontuais e distribuídas
+	 * aplicadas ao longo da barra no sistema de coordenadas local.
+	 * 
+	 * @return EquivalentLoadLocal vetor com as forças equivalentes total no sistema
+	 *         local
+	 */
+	public abstract Vetor getEquivalentLoadLocal();
+
+	/**
+	 * Método abstrato de acesso Get que retorna as forças equivalentes nos nós
+	 * iniciais e finais, oriundas do somatório de cargas pontuais e distribuídas
+	 * aplicadas ao longo da barra no sistema de coordenadas global.
+	 * 
+	 * @return EquivalentLoadLocal vetor com as forças equivalentes total no sistema
+	 *         global
+	 */
+	public abstract Vetor getEquivalentLoadGlobal();
+
+}

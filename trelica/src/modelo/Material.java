@@ -1,0 +1,121 @@
+package modelo;
+
+/**
+ * Classe que descreve um material utilizado em barras que compõe um modelo
+ * estrutural reticulado espacial
+ * <p>
+ * Dados:
+ * <ul>
+ * <li>id - identificador do material
+ * <li>E - módulo de elasticidade do material
+ * <li>ni - coeficiente de Poisson do material
+ * </ul>
+ * 
+ * @author Tainan Brandão
+ * @version 1.0
+ */
+
+public class Material {
+
+	/**
+	 * Declaração dos campos da classe.
+	 */
+	private String id;
+	private double E;
+	private double ni;
+
+	/**
+	 * Construtor sem parâmetro.
+	 */
+	public Material() {
+		this.id = null;
+		this.E = 0.0d;
+		this.ni = 0.0d;
+	}
+
+	/**
+	 * Construtor que recebe como argumento o identificador (id), o módulo de
+	 * elasticidade (E) e o coeficiente de Poisson (ni) e preenche todos os campos
+	 * do material.
+	 * 
+	 * @param id identificador do material
+	 * @param E  módulo de elasticidade do material
+	 * @param ni coeficiente de Poisson do material
+	 */
+	public Material(String id, double E, double ni) {
+		this.id = id;
+		this.E = E;
+		this.ni = ni;
+	}
+
+	/**
+	 * Método de acesso Get que retorna o identificador do material (id)
+	 * 
+	 * @return identificador do material
+	 */
+	public String get_id() {
+		return id;
+	}
+
+	/**
+	 * Método de acesso Get que retorna o módulo de elasticidade do material (E)
+	 * 
+	 * @return módulo de elasticidade do material
+	 */
+	public double get_E() {
+		return E;
+	}
+
+	/**
+	 * Método de acesso Get que retorna o coeficiente de Poisson do material (ni)
+	 * 
+	 * @return coeficiente de Poisson do material
+	 */
+	public double get_ni() {
+		return ni;
+	}
+
+	/**
+	 * Método modificador Set do identificador do material (id) (sem retorno)
+	 * 
+	 * @param id identificador do material
+	 */
+	public void set_id(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * Método modificador Set do módulo de elasticidade do material (E) (sem
+	 * retorno)
+	 * 
+	 * @param E módulo de elasticidade do material
+	 */
+	public void set_E(double E) {
+		this.E = E;
+	}
+
+	/**
+	 * Método modificador Set do coeficiente de poisson do material (ni) (sem
+	 * retorno)
+	 * 
+	 * @param ni coeficiente de poisson do material
+	 */
+	public void set_ni(double ni) {
+		this.ni = ni;
+	}
+
+	/**
+	 * Método que retorna um texto contendo os dados do material: identificador
+	 * (id), módulo de elasticidade (E) e coeficiente de Poisson (ni).
+	 * 
+	 * @return Texto contendo os dados do material
+	 */
+	public String toString() {
+		String texto;
+		texto = this.id;
+		texto += " / E = " + E;
+		texto += " / poisson = " + ni;
+		return texto;
+	}
+
+}

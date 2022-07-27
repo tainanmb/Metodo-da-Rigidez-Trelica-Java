@@ -1,0 +1,283 @@
+COMPUTATION APPLIED DO ENGINEERING - TRUSS
+
+___________________DADOS DE ENTRADA___________________
+Barras do modelo estrutural do tipo: Truss
+Número de nós: 8
+Número de materiais: 2
+Número de seções: 2
+Número de barras: 13
+
+ ******************Barra B12******************
+ Nó inicial N1
+ Coordenadas (x, y, z): (0.0, 0.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 0.0   0.0
+ Restrições nodais: true   true   
+ Equações nodais: -1   -2   
+
+ Nó final N2
+ Coordenadas (x, y, z): (2.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: -3.968253968253976E-5   -0.0013761664255529378
+ Restrições nodais: false   false   
+ Equações nodais: 1   2   
+
+ Material M1 / E = 2.1E8 / poisson = 0.3
+
+ Seção S1 / Área = 0.006 / Inércia = 7.2E-6
+ 
+ ******************Barra B23******************
+ Nó inicial N2
+ Coordenadas (x, y, z): (2.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: -3.968253968253976E-5   -0.0013761664255529378
+ Restrições nodais: false   false   
+ Equações nodais: 1   2   
+
+ Nó final N3
+ Coordenadas (x, y, z): (4.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: -1.714682090848482E-19   -0.0021840949166102657
+ Restrições nodais: false   false   
+ Equações nodais: 3   4   
+
+ Material M1 / E = 2.1E8 / poisson = 0.3
+
+ Seção S1 / Área = 0.006 / Inércia = 7.2E-6
+ 
+ ******************Barra B34******************
+ Nó inicial N3
+ Coordenadas (x, y, z): (4.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: -1.714682090848482E-19   -0.0021840949166102657
+ Restrições nodais: false   false   
+ Equações nodais: 3   4   
+
+ Nó final N4
+ Coordenadas (x, y, z): (6.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: 3.968253968253943E-5   -0.002376166425552938
+ Restrições nodais: false   false   
+ Equações nodais: 5   6   
+
+ Material M1 / E = 2.1E8 / poisson = 0.3
+
+ Seção S1 / Área = 0.006 / Inércia = 7.2E-6
+ 
+ ******************Barra B45******************
+ Nó inicial N4
+ Coordenadas (x, y, z): (6.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: 3.968253968253943E-5   -0.002376166425552938
+ Restrições nodais: false   false   
+ Equações nodais: 5   6   
+
+ Nó final N5
+ Coordenadas (x, y, z): (8.0, 0.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 0.0   -0.002
+ Restrições nodais: true   true   
+ Equações nodais: -3   -4   
+
+ Material M1 / E = 2.1E8 / poisson = 0.3
+
+ Seção S1 / Área = 0.006 / Inércia = 7.2E-6
+ 
+ ******************Barra B67******************
+ Nó inicial N6
+ Coordenadas (x, y, z): (2.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 7.380952380952382E-4   -0.0012094997588862708
+ Restrições nodais: false   false   
+ Equações nodais: 7   8   
+
+ Nó final N7
+ Coordenadas (x, y, z): (4.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 4.999999999999997E-4   -0.0020729838054991544
+ Restrições nodais: false   false   
+ Equações nodais: 9   10   
+
+ Material M1 / E = 2.1E8 / poisson = 0.3
+
+ Seção S1 / Área = 0.006 / Inércia = 7.2E-6
+ 
+ ******************Barra B78******************
+ Nó inicial N7
+ Coordenadas (x, y, z): (4.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 4.999999999999997E-4   -0.0020729838054991544
+ Restrições nodais: false   false   
+ Equações nodais: 9   10   
+
+ Nó final N8
+ Coordenadas (x, y, z): (6.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 2.61904761904761E-4   -0.0022094997588862713
+ Restrições nodais: false   false   
+ Equações nodais: 11   12   
+
+ Material M1 / E = 2.1E8 / poisson = 0.3
+
+ Seção S1 / Área = 0.006 / Inércia = 7.2E-6
+ 
+ ******************Barra B16******************
+ Nó inicial N1
+ Coordenadas (x, y, z): (0.0, 0.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 0.0   0.0
+ Restrições nodais: true   true   
+ Equações nodais: -1   -2   
+
+ Nó final N6
+ Coordenadas (x, y, z): (2.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 7.380952380952382E-4   -0.0012094997588862708
+ Restrições nodais: false   false   
+ Equações nodais: 7   8   
+
+ Material M2 / E = 2.0E8 / poisson = 0.25
+
+ Seção S2 / Área = 0.009 / Inércia = 1.6874999999999997E-5
+ 
+ ******************Barra B26******************
+ Nó inicial N2
+ Coordenadas (x, y, z): (2.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: -3.968253968253976E-5   -0.0013761664255529378
+ Restrições nodais: false   false   
+ Equações nodais: 1   2   
+
+ Nó final N6
+ Coordenadas (x, y, z): (2.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 7.380952380952382E-4   -0.0012094997588862708
+ Restrições nodais: false   false   
+ Equações nodais: 7   8   
+
+ Material M2 / E = 2.0E8 / poisson = 0.25
+
+ Seção S2 / Área = 0.009 / Inércia = 1.6874999999999997E-5
+ 
+ ******************Barra B27******************
+ Nó inicial N2
+ Coordenadas (x, y, z): (2.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: -3.968253968253976E-5   -0.0013761664255529378
+ Restrições nodais: false   false   
+ Equações nodais: 1   2   
+
+ Nó final N7
+ Coordenadas (x, y, z): (4.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 4.999999999999997E-4   -0.0020729838054991544
+ Restrições nodais: false   false   
+ Equações nodais: 9   10   
+
+ Material M2 / E = 2.0E8 / poisson = 0.25
+
+ Seção S2 / Área = 0.009 / Inércia = 1.6874999999999997E-5
+ 
+ ******************Barra B37******************
+ Nó inicial N3
+ Coordenadas (x, y, z): (4.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: -1.714682090848482E-19   -0.0021840949166102657
+ Restrições nodais: false   false   
+ Equações nodais: 3   4   
+
+ Nó final N7
+ Coordenadas (x, y, z): (4.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 4.999999999999997E-4   -0.0020729838054991544
+ Restrições nodais: false   false   
+ Equações nodais: 9   10   
+
+ Material M2 / E = 2.0E8 / poisson = 0.25
+
+ Seção S2 / Área = 0.009 / Inércia = 1.6874999999999997E-5
+ 
+ ******************Barra B47******************
+ Nó inicial N4
+ Coordenadas (x, y, z): (6.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: 3.968253968253943E-5   -0.002376166425552938
+ Restrições nodais: false   false   
+ Equações nodais: 5   6   
+
+ Nó final N7
+ Coordenadas (x, y, z): (4.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 4.999999999999997E-4   -0.0020729838054991544
+ Restrições nodais: false   false   
+ Equações nodais: 9   10   
+
+ Material M2 / E = 2.0E8 / poisson = 0.25
+
+ Seção S2 / Área = 0.009 / Inércia = 1.6874999999999997E-5
+ 
+ ******************Barra B48******************
+ Nó inicial N4
+ Coordenadas (x, y, z): (6.0, 0.0, 0.0)
+ Forças nodais: 0.0   -100.0   
+ Deslocamentos nodais: 3.968253968253943E-5   -0.002376166425552938
+ Restrições nodais: false   false   
+ Equações nodais: 5   6   
+
+ Nó final N8
+ Coordenadas (x, y, z): (6.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 2.61904761904761E-4   -0.0022094997588862713
+ Restrições nodais: false   false   
+ Equações nodais: 11   12   
+
+ Material M2 / E = 2.0E8 / poisson = 0.25
+
+ Seção S2 / Área = 0.009 / Inércia = 1.6874999999999997E-5
+ 
+ ******************Barra B58******************
+ Nó inicial N5
+ Coordenadas (x, y, z): (8.0, 0.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 0.0   -0.002
+ Restrições nodais: true   true   
+ Equações nodais: -3   -4   
+
+ Nó final N8
+ Coordenadas (x, y, z): (6.0, 2.0, 0.0)
+ Forças nodais: 0.0   0.0   
+ Deslocamentos nodais: 2.61904761904761E-4   -0.0022094997588862713
+ Restrições nodais: false   false   
+ Equações nodais: 11   12   
+
+ Material M2 / E = 2.0E8 / poisson = 0.25
+
+ Seção S2 / Área = 0.009 / Inércia = 1.6874999999999997E-5
+ 
+___________________DADOS DE SAÍDA___________________
+******************Deslocamentos nodais******************
+ID: (Dx, Dy)
+Nó N1:   0,000E+00   0,000E+00  
+Nó N2:  -3,968E-05  -1,376E-03  
+Nó N3:  -1,715E-19  -2,184E-03  
+Nó N4:   3,968E-05  -2,376E-03  
+Nó N5:   0,000E+00  -2,000E-03  
+Nó N6:   7,381E-04  -1,209E-03  
+Nó N7:   5,000E-04  -2,073E-03  
+Nó N8:   2,619E-04  -2,209E-03  
+
+*****************Forças de extremidade******************
+ID: Nó inicial (Fx, Fy) + Nó final (Fx, Fy)
+Barra B12:   2,500E+01   0,000E+00  -2,500E+01   0,000E+00  
+Barra B23:  -2,500E+01   0,000E+00   2,500E+01   0,000E+00  
+Barra B34:  -2,500E+01   0,000E+00   2,500E+01   0,000E+00  
+Barra B45:   2,500E+01   0,000E+00  -2,500E+01   0,000E+00  
+Barra B67:   1,500E+02   0,000E+00  -1,500E+02   0,000E+00  
+Barra B78:   1,500E+02   0,000E+00  -1,500E+02   0,000E+00  
+Barra B16:   2,121E+02   0,000E+00  -2,121E+02   0,000E+00  
+Barra B26:  -1,500E+02   0,000E+00   1,500E+02   0,000E+00  
+Barra B27:   7,071E+01   0,000E+00  -7,071E+01   0,000E+00  
+Barra B37:  -1,000E+02   0,000E+00   1,000E+02   0,000E+00  
+Barra B47:   7,071E+01   0,000E+00  -7,071E+01   0,000E+00  
+Barra B48:  -1,500E+02   0,000E+00   1,500E+02   0,000E+00  
+Barra B58:   2,121E+02   0,000E+00  -2,121E+02   0,000E+00  
